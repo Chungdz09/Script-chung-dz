@@ -419,4 +419,4 @@ local Section = Tab4:CreateSection("Other")
             Event:FireServer(chest, putIn, itemID)
         end
     end,
- })</pre>
+ })
