@@ -408,11 +408,11 @@ local Section = Tab4:CreateSection("Glider")
 local Section = Tab4:CreateSection("Other")
 
  local Button = Tab4:CreateButton({
-    Name = "🎃Pumpkin Shield🎃",
+    Name = "🎃Pumpkin Shield 10x🎃",
     Callback = function()
         local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
         local putIn = true
-        local itemIDs = {379}
+        local itemIDs = {379, 379, 379, 379, 379, 379, 379, 379, 379, 379}
         local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
     
         for _, itemID in ipairs(itemIDs) do
@@ -420,16 +420,3 @@ local Section = Tab4:CreateSection("Other")
         end
     end,
  })
-
-local Button = Tab4:CreateButton({
-   Name = "🌋Dupe Obsidian Armor",     
-      local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
-      local putIn = true
-      local itemIDs = {225,226,227,228,235}
-      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
-  
-      for _, itemID in ipairs(itemIDs) do
-          Event:FireServer(chest, putIn, itemID)
-      end
- end,
-})
