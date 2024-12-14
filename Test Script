@@ -18,76 +18,18 @@ local Window = Rayfield:CreateWindow({
        FileName = "0", 
        SaveKey = false,
        GrabKeyFromSite = false,
-       Key = {"https://pastebin.com/raw/CmvtLtHf"}
+       Key = {""}
     }
  })
 
  local MainTab = Window:CreateTab("🏠 Main", nil) 
  local MainSection = MainTab:CreateSection("Other Scripts")
- 
-local Button = MainTab:CreateButton({
-   Name = "Infinite yield",
-   Callback = function()
-    loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()  
-  end,
-})
 
-local Button = MainTab:CreateButton({
-   Name = "Dark Dex",
-   Callback = function()
-    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Dex%20Explorer.txt"))()
-  end,
-})
-
-local Button = MainTab:CreateButton({
-   Name = "ESP",
-   Callback = function()
-    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/WRD%20ESP.txt"))()
-   end,
-})
-
-local MainSection = MainTab:CreateSection("Toggles")
-
-local Toggle = MainTab:CreateToggle({
-   Name = "Toggle Inf Jump",
-   CurrentValue = false,
-   Flag = "Toggle1", 
-   Callback = function(Value)
-   loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Infinite%20Jump.txt"))()
-   end,
-})
-
-local MainSection = MainTab:CreateSection("Sliders")
-
-local Slider = MainTab:CreateSlider({
-   Name = "WalkSpeed Slider",
-   Range = {1, 350},
-   Increment = 1,
-   Suffix = "Speed",
-   CurrentValue = 16,
-   Flag = "sliderws", 
-   Callback = function(Value)
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = (Value)
-   end,
-})
-
-local Slider = MainTab:CreateSlider({
-   Name = "JumpPower Slider",
-   Range = {1, 350},
-   Increment = 1,
-   Suffix = "Speed",
-   CurrentValue = 16,
-   Flag = "sliderjp",
-   Callback = function(Value)
-        game.Players.LocalPlayer.Character.Humanoid.JumpPower = (Value)
-   end,
-})
-    
-local Tab2 = Window:CreateTab("🤑 Duping", nil)
-local Section = Tab2:CreateSection("Start Duping items") 
+local Tab1 = Window:CreateTab("🤑 Duping", nil)
+local Section = Tab1:CreateSection("Start Duping items") 
 
 
-local Button = Tab2:CreateButton({
+local Button = Tab1:CreateButton({
     Name = "🏁Start Dupe",
     Callback = function()
         getgenv().olddata = game:GetService("ReplicatedStorage").References.Comm.Events.SetSettings
@@ -95,9 +37,9 @@ local Button = Tab2:CreateButton({
     end,
  })
 
-local Section = Tab2:CreateSection("Armors") 
+local Section = Tab1:CreateSection("Armors") 
 
-local Button = Tab2:CreateButton({
+local Button = Tab1:CreateButton({
    Name = "🌋Dupe Obsidian Armor",
    Callback = function()
       local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
@@ -111,7 +53,7 @@ local Button = Tab2:CreateButton({
  end,
 })
  
- local Button = Tab2:CreateButton({
+ local Button = Tab1:CreateButton({
     Name = "🦴Soul Duping",
     Callback = function()
         local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
@@ -125,9 +67,9 @@ local Button = Tab2:CreateButton({
     end,
  })
  
-local Section = Tab2:CreateSection("Packs") 
+local Section = Tab1:CreateSection("Packs") 
 
- local Button = Tab2:CreateButton({
+ local Button = Tab1:CreateButton({
     Name = "📦Chest pack 25x",
     Callback = function()
       local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
@@ -142,7 +84,7 @@ local Section = Tab2:CreateSection("Packs")
   end,
 })
  
-local Button = Tab2:CreateButton({
+local Button = Tab1:CreateButton({
    Name = "🍭Candypack 500x 😊",
    Callback = function()
      local localChest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
@@ -161,7 +103,7 @@ local Button = Tab2:CreateButton({
  end,
 })
 
- local Button = Tab2:CreateButton({
+ local Button = Tab1:CreateButton({
     Name = "🍉Fruit pack 25x",
     Callback = function()
       local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
@@ -175,7 +117,7 @@ local Button = Tab2:CreateButton({
   end,
 })
 
- local Button = Tab2:CreateButton({
+ local Button = Tab1:CreateButton({
     Name = "🛡️Prot. pack 25x",
     Callback = function()
       local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
@@ -203,7 +145,7 @@ local Button = Tab2:CreateButton({
   end,
 })
 
- local Button = Tab2:CreateButton({
+ local Button = Tab1:CreateButton({
     Name = "🪓Fresh pack 25x",
     Callback = function()
       local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
@@ -217,7 +159,7 @@ local Button = Tab2:CreateButton({
   end,
 })
 
- local Button = Tab2:CreateButton({
+ local Button = Tab1:CreateButton({
     Name = "Stone pack 25x",
     Callback = function()
       local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
@@ -231,11 +173,11 @@ local Button = Tab2:CreateButton({
   end,
 })
 
-local Tab3 = Window:CreateTab("😵‍💫 Crazy Dupe", nil)
-local Section = Tab3:CreateSection("Gliders 🪁")
+local Tab2 = Window:CreateTab("😵‍💫 Crazy Dupe", nil)
+local Section = Tab2:CreateSection("Gliders 🪁")
 
 
- local Button = Tab3:CreateButton({
+ local Button = Tab2:CreateButton({
     Name = "🪁Easter Glider🪁",
     Callback = function()
         local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
@@ -249,7 +191,7 @@ local Section = Tab3:CreateSection("Gliders 🪁")
     end,
  })
 
- local Button = Tab3:CreateButton({
+ local Button = Tab2:CreateButton({
     Name = "🪁Glider🪁",
     Callback = function()
         local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
@@ -263,9 +205,9 @@ local Section = Tab3:CreateSection("Gliders 🪁")
     end,
  })
 
-local Section = Tab3:CreateSection("Others")
+local Section = Tab2:CreateSection("Others")
 
- local Button = Tab3:CreateButton({
+ local Button = Tab2:CreateButton({
     Name = "🌀Portal Book",
     Callback = function()
         local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
@@ -279,7 +221,7 @@ local Section = Tab3:CreateSection("Others")
     end,
  })
 
- local Button = Tab3:CreateButton({
+ local Button = Tab2:CreateButton({
     Name = "🛡️Deflect Book",
     Callback = function()
         local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
@@ -294,7 +236,7 @@ local Section = Tab3:CreateSection("Others")
  })
 
 
- local Button = Tab3:CreateButton({
+ local Button = Tab2:CreateButton({
     Name = "🥶Freezio Book",
     Callback = function()
         local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
@@ -308,7 +250,7 @@ local Section = Tab3:CreateSection("Others")
     end,
  })
 
- local Button = Tab3:CreateButton({
+ local Button = Tab2:CreateButton({
     Name = "💀Oofio Book",
     Callback = function()
         local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
@@ -322,7 +264,7 @@ local Section = Tab3:CreateSection("Others")
     end,
  })
 
- local Button = Tab3:CreateButton({
+ local Button = Tab2:CreateButton({
     Name = "🎃Pumpkin Shield🎃",
     Callback = function()
         local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
@@ -337,11 +279,11 @@ local Section = Tab3:CreateSection("Others")
  })
 
 local Tab4 = Window:CreateTab("📦Moonstone Chest input", nil)
-local Section = Tab4:CreateSection("Put your items into a Moonstone Chest")
+local Section = Tab3:CreateSection("Put your items into a Moonstone Chest")
 
-local Section = Tab4:CreateSection("Packs")
+local Section = Tab3:CreateSection("Packs")
 
- local Button = Tab4:CreateButton({
+ local Button = Tab3:CreateButton({
     Name = "📦Chestpack 25x",
     Callback = function()
       local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
@@ -356,7 +298,7 @@ local Section = Tab4:CreateSection("Packs")
   end,
 })
  
-local Button = Tab4:CreateButton({
+local Button = Tab3:CreateButton({
    Name = "🍭Candypack 500x",
    Callback = function()
      local localChest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
@@ -375,9 +317,9 @@ local Button = Tab4:CreateButton({
  end,
 })
 
-local Section = Tab4:CreateSection("Glider")
+local Section = Tab3:CreateSection("Glider")
 
- local Button = Tab4:CreateButton({
+ local Button = Tab3:CreateButton({
     Name = "🪁Easter Glider🪁",
     Callback = function()
         local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
@@ -391,7 +333,7 @@ local Section = Tab4:CreateSection("Glider")
     end,
  })
 
- local Button = Tab4:CreateButton({
+ local Button = Tab3:CreateButton({
     Name = "🪁Glider🪁",
     Callback = function()
         local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
@@ -405,14 +347,14 @@ local Section = Tab4:CreateSection("Glider")
     end,
  })
 
-local Section = Tab4:CreateSection("Other")
+local Section = Tab3:CreateSection("Other")
 
- local Button = Tab4:CreateButton({
-    Name = "🎃Pumpkin Shield🎃",
+ local Button = Tab3:CreateButton({
+    Name = "🎃Pumpkin Shield 10x🎃",
     Callback = function()
         local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
         local putIn = true
-        local itemIDs = {379}
+        local itemIDs = {379, 379, 379, 379, 379, 379, 379, 379, 379, 379}
         local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
     
         for _, itemID in ipairs(itemIDs) do
