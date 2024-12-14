@@ -433,18 +433,3 @@ local Button = Tab4:CreateButton({
       end
  end,
 })
-
-local Button = Tab4:CreateButton({
-    Name = "🦴Soul Duping",
-    Callback = function()
-        local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
-        local putIn = true
-        local itemIDs = {204, 202, 201, 203, 218, 216}
-        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
-    
-        for _, itemID in ipairs(itemIDs) do
-            Event:FireServer(chest, putIn, itemID)
-        end
-    end,
- })
- 
