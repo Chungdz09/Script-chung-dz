@@ -420,3 +420,19 @@ local Section = Tab4:CreateSection("Other")
         end
     end,
  })
+
+local Section = Tab4:CreateSection("Armors") 
+
+local Button = Tab4:CreateButton({
+   Name = "🌋Dupe Obsidian Armor",
+   Callback = function()
+      local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
+      local putIn = true
+      local itemIDs = {225,226,227,228,235}
+      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+  
+      for _, itemID in ipairs(itemIDs) do
+          Event:FireServer(chest, putIn, itemID)
+      end
+ end,
+})
