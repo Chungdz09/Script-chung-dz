@@ -24,7 +24,14 @@ local Window = Rayfield:CreateWindow({
 
  local MainTab = Window:CreateTab("🏠 Main", nil) 
  local MainSection = MainTab:CreateSection("Other Scripts")
- 
+
+local Button = MainTab:CreateButton({
+   Name = "Aimbot",
+   Callback = function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/WRD%20Aimbot.txt"))()  
+  end,
+})
+
 local Button = MainTab:CreateButton({
    Name = "Infinite yield",
    Callback = function()
