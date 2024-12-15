@@ -33,6 +33,13 @@ local Button = MainTab:CreateButton({
 })
 
 local Button = MainTab:CreateButton({
+   Name = "Ctrl + click TP",
+   Callback = function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Click%20Teleport.txt"))()  
+  end,
+})
+
+local Button = MainTab:CreateButton({
    Name = "Infinite yield",
    Callback = function()
     loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()  
