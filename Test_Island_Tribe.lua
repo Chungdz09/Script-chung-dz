@@ -3,22 +3,22 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
     Name = "                                Island Tribes 🌴",
     LoadingTitle = "hello boys",
-    LoadingSubtitle = "Made by Chungdz credit to my friend",
+    LoadingSubtitle = "Made by Chungdz credit to Friend",
     ConfigurationSaving = {
-       Enabled = false,
+       Enabled = flase,
        FolderName = nil, 
        FileName = "shoot you're self"
     },
 
-    KeySystem =false,
+    KeySystem = true,
     KeySettings = {
        Title = "Island Tribes 🌴",
        Subtitle = "Made by Chung credit #Chungdz",
        Note = "this guy is gay gbaox_01",
        FileName = "0", 
-       SaveKey = false,
-       GrabKeyFromSite = false,
-       Key = {"https://pastebin.com/raw/CmvtLtHf"}
+       SaveKey = true,
+       GrabKeyFromSite = true,
+       Key = {"https://raw.githubusercontent.com/Chungdz09/Script-chung-dz/refs/heads/main/Key"}
     }
  })
 
