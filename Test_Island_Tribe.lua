@@ -7,7 +7,7 @@ local Window = Rayfield:CreateWindow({
     ConfigurationSaving = {
        Enabled = flase,
        FolderName = nil, 
-       FileName = "shoot you're self"
+       FileName = "Nigga 69"
     },
 
     KeySystem = true,
