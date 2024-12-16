@@ -2,7 +2,7 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
  
 local Window = Rayfield:CreateWindow({
     Name = "                                Island Tribes 🌴",
-    LoadingTitle = "hello boys",
+    LoadingTitle = "WSP",
     LoadingSubtitle = "Made by Chungdz credit to Friend",
     ConfigurationSaving = {
        Enabled = flase,
