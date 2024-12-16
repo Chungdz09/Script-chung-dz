@@ -26,13 +26,6 @@ local Window = Rayfield:CreateWindow({
  local MainSection = MainTab:CreateSection("Other Scripts")
 
 local Button = MainTab:CreateButton({
-   Name = "Killaura",
-   Callback = function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Chungdz09/Script-chung-dz/refs/heads/main/Killaura.lua"))()  
-  end,
-})
-
-local Button = MainTab:CreateButton({
    Name = "Ctrl + click TP",
    Callback = function()
     loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Click%20Teleport.txt"))()  
