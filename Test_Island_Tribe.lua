@@ -26,9 +26,9 @@ local Window = Rayfield:CreateWindow({
  local MainSection = MainTab:CreateSection("Other Scripts")
 
 local Button = MainTab:CreateButton({
-   Name = "Aimbot",
+   Name = "Killaura",
    Callback = function()
-    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/WRD%20Aimbot.txt"))()  
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Chungdz09/Script-chung-dz/refs/heads/main/Killaura.lua"))()  
   end,
 })
 
