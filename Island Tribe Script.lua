@@ -382,8 +382,8 @@ local Button = Tab4:CreateButton({
  end,
 })
 
-local Button = Tab2:CreateButton({
-    Name = "🍉Fruit pack 25x",
+local Button = Tab4:CreateButton({
+    Name = "Fruit pack 25x",
     Callback = function()
       local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
       local putIn = true
