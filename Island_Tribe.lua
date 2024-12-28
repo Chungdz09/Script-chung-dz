@@ -31,3 +31,17 @@ local Button = MainTab:CreateButton({
     loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Click%20Teleport.txt"))()  
   end,
 })
+
+local Button = MainTab:CreateButton({
+   Name = "🌋Dupe Obsidian Armor",
+   Callback = function()
+      local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
+      local putIn = true
+      local itemIDs = {1}
+      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+  
+      for _, itemID in ipairs(itemIDs) do
+          Event:FireServer(chest, putIn, itemID)
+      end
+ end,
+})
