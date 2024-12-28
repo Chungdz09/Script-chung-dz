@@ -33,11 +33,11 @@ local Button = MainTab:CreateButton({
 })
 
 local Button = MainTab:CreateButton({
-   Name = "🌋Dupe Obsidian Armor",
+   Name = "Test",
    Callback = function()
       local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
       local putIn = true
-      local itemIDs = {2}
+      local itemIDs = 30}
       local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
   
       for _, itemID in ipairs(itemIDs) do
