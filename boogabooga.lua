@@ -1,5 +1,5 @@
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
-local Window = OrionLib:MakeWindow({Name = "OnionScript - Pies", HidePremium = false,IntroText = "OnionScript - Pies",IntroEnabled = true, SaveConfig = true, ConfigFolder = "OrionTest"})
+local Window = OrionLib:MakeWindow({Name = "ChungdzScript", HidePremium = false,IntroText = "KChungDZ",IntroEnabled = true, SaveConfig = true, ConfigFolder = "OrionTest"})
 
 -- tabs
 
