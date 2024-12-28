@@ -10,7 +10,7 @@ local Window = Rayfield:CreateWindow({
        FileName = "Nigga 69"
     },
 
-    KeySystem = true,
+    KeySystem = false,
     KeySettings = {
        Title = "Island Tribes 🌴",
        Subtitle = "Made by Chung credit #Chungdz",
@@ -23,10 +23,10 @@ local Window = Rayfield:CreateWindow({
  })
 
 local Tab1 = Window:CreateTab("🤑 Duping", nil)
-local Section = Tab2:CreateSection("Start Duping items") 
+local Section = Tab1:CreateSection("Start Duping items") 
 
 
-local Button = Tab2:CreateButton({
+local Button = Tab1:CreateButton({
     Name = "🏁Start Dupe",
     Callback = function()
         getgenv().olddata = game:GetService("ReplicatedStorage").References.Comm.Events.SetSettings
@@ -34,9 +34,9 @@ local Button = Tab2:CreateButton({
     end,
  })
 
-local Section = Tab2:CreateSection("Armors") 
+local Section = Tab1:CreateSection("Armors") 
 
-local Button = Tab2:CreateButton({
+local Button = Tab1:CreateButton({
    Name = "random",
    Callback = function()
       local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
