@@ -23,7 +23,7 @@ local Window = Rayfield:CreateWindow({
  })
 
  local MainTab = Window:CreateTab("🏠 Main", nil) 
- local MainSection = MainTab:CreateSection("Other Scripts")
+ local MainSection = MainTab:CreateSection("Start Duping items")
 
 local Button = MainTab:CreateButton({
    Name = "Ctrl + click TP",
