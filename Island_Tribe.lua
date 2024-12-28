@@ -22,30 +22,12 @@ local Window = Rayfield:CreateWindow({
     }
  })
 
-local Tab1 = Window:CreateTab("🤑 Duping", nil)
-local Section = Tab1:CreateSection("Start Duping items") 
+ local MainTab = Window:CreateTab("🏠 Main", nil) 
+ local MainSection = MainTab:CreateSection("Other Scripts")
 
-
-local Button = Tab1:CreateButton({
-    Name = "🏁Start Dupe",
-    Callback = function()
-        getgenv().olddata = game:GetService("ReplicatedStorage").References.Comm.Events.SetSettings
-        game:GetService("ReplicatedStorage").References.Comm.Events.SetSettings:FireServer(getgenv().olddata)    
-    end,
- })
-
-local Section = Tab1:CreateSection("Armors") 
-
-local Button = Tab1:CreateButton({
-   Name = "random",
+local Button = MainTab:CreateButton({
+   Name = "Ctrl + click TP",
    Callback = function()
-      local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
-      local putIn = true
-      local itemIDs = {1}
-      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
-  
-      for _, itemID in ipairs(itemIDs) do
-          Event:FireServer(chest, putIn, itemID)
-      end
- end,
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Click%20Teleport.txt"))()  
+  end,
 })
