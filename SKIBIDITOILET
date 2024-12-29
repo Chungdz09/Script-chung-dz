@@ -484,6 +484,6 @@ local Section = Tab4:CreateSection("Chest")
 local Button = Tab4:CreateButton({
     Name = "Open Chest",
     Callback = function()
-        RemoteEvents['InventoryInteraction']:FireServer(168, "Open")
+        local Events['InventoryInteraction']:FireServer(168, "Open")
     end
 })
