@@ -479,11 +479,16 @@ local Button = Tab4:CreateButton({
     end,
  })
 
-local Section = Tab4:CreateSection("Chest") 
-
 local Button = Tab4:CreateButton({
-    Name = "Open Chest",
+    Name = "Ob Snowball",
     Callback = function()
-        local Events['InventoryInteraction']:FireServer(168, "Open")
-    end
-})
+        local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
+        local putIn = true
+        local itemIDs = {352}
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+    
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+ })
