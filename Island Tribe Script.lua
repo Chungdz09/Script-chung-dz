@@ -370,7 +370,7 @@ local Button = Tab4:CreateButton({
      local putIn = true
      local itemIDs = {}
       
-      for i = 1, 500 do
+      for i = 1, 5000 do
           table.insert(itemIDs, 188)
       end
       
@@ -449,7 +449,7 @@ local Button = Tab4:CreateButton({
    Callback = function()
       local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
       local putIn = true
-      local itemIDs = {225,226,227,228,235}
+      local itemIDs = {225,226,227,228,235,293,230}
       local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
   
       for _, itemID in ipairs(itemIDs) do
@@ -471,3 +471,36 @@ local Button = Tab4:CreateButton({
         end
     end,
  })
+
+local Button = Tab4:CreateButton({
+    Name = "Moon Duping",
+    Callback = function()
+        local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
+        local putIn = true
+        local itemIDs = {369, 366, 365, 364, 363, 370,199,222}
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+    
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+ })
+
+local Button = Tab4:CreateButton({
+   Name = "Easter Candy",
+   Callback = function()
+     local localChest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
+     local putIn = true
+     local itemIDs = {}
+      
+      for i = 1, 5000 do
+          table.insert(itemIDs, 271)
+      end
+      
+      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+      
+      for _, itemID in ipairs(itemIDs) do
+          Event:FireServer(localChest, putIn, itemID)
+      end
+ end,
+})
