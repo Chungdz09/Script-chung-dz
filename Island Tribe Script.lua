@@ -403,7 +403,7 @@ local Button = Tab4:CreateButton({
 })
 
 local Button = Tab4:CreateButton({
-   Name = "🍭Candypack 500x",
+   Name = "Zen Pack 500x",
    Callback = function()
      local localChest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
      local putIn = true
