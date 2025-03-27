@@ -102,6 +102,13 @@ local Button = MainTab:CreateButton({
    end,
 })
 
+local Button = MainTab:CreateButton({
+   Name = "AimBot",
+   Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Chungdz09/Script-chung-dz/refs/heads/main/KchungdzAimbot.lua"))()
+   end,
+})
+
 local MainSection = MainTab:CreateSection("Toggles")
 
 local Toggle = MainTab:CreateToggle({
