@@ -2,9 +2,9 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
     Name = "                                DaHood XD",
     LoadingTitle = "WSP",
-    LoadingSubtitle = "Made by Chungdz credit to Friend",
+    LoadingSubtitle = "Made by Chungdz",
     ConfigurationSaving = {
-       Enabled = flase,
+       Enabled = true,
        FolderName = nil, 
        FileName = "Kchungdz"
     },
