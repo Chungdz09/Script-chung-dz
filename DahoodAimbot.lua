@@ -4,7 +4,7 @@ local RunService = game:GetService("RunService")
 
 -- Configuration
 local lockRange = 70 -- Maximum distance to lock onto a player
-local rotationSpeed = 1 -- Speed at which the turret rotates
+local rotationSpeed = 1.5 -- Speed at which the turret rotates
 local toggleKey = Enum.KeyCode.X -- Key to toggle lock-on
 
 -- Variables
