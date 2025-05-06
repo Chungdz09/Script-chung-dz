@@ -6,12 +6,12 @@ local Window = Rayfield:CreateWindow({
     ConfigurationSaving = {
        Enabled = flase,
        FolderName = nil, 
-       FileName = "Nigga 69"
+       FileName = "Kchungdz"
     },
 
     KeySystem = true,
     KeySettings = {
-       Title = "Island Tribes 🌴",
+       Title = "Dahood XD",
        Subtitle = "Made by Chung credit #Chungdz",
        Note = "this guy is gay gbaox_01",
        FileName = "0", 
@@ -54,7 +54,7 @@ local Button = MainTab:CreateButton({
 local Button = MainTab:CreateButton({
    Name = "AimBot Press X On/Off",
    Callback = function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Chungdz09/Script-chung-dz/refs/heads/main/KchungdzAimbot.lua"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Chungdz09/Script-chung-dz/refs/heads/main/DahoodAimbot.lua"))()
    end,
 })
 
