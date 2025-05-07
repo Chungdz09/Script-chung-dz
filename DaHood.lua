@@ -45,6 +45,13 @@ local Button = MainTab:CreateButton({
 })
 
 local Button = MainTab:CreateButton({
+   Name = "Noclip Press N On/Off",
+   Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Chungdz09/Script-chung-dz/refs/heads/main/Noclip.lua"))()
+  end,
+})
+
+local Button = MainTab:CreateButton({
    Name = "ESP",
    Callback = function()
     loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/WRD%20ESP.txt"))()
