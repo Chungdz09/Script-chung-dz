@@ -65,6 +65,13 @@ local Button = MainTab:CreateButton({
    end,
 })
 
+local Button = MainTab:CreateButton({
+   Name = "AimBotFOV Press F On/Off",
+   Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Chungdz09/Script-chung-dz/refs/heads/main/AimbotScriptFOV.lua"))()
+   end,
+})
+
 local MainSection = MainTab:CreateSection("Toggles")
 
 local Toggle = MainTab:CreateToggle({
