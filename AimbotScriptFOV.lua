@@ -6,7 +6,7 @@ local RunService = game:GetService("RunService")
 local lockRange = 50 -- studs
 local rotationSpeed = 0.1
 local toggleKey = Enum.KeyCode.X
-local fovAngle = 10 -- degrees
+local fovAngle = 15 -- degrees
 local visualFovRadius = 100 -- pixels (for on-screen circle only)
 
 -- Variables
