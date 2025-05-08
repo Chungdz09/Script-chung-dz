@@ -53,6 +53,13 @@ local Button = MainTab:CreateButton({
 })
 
 local Button = MainTab:CreateButton({
+   Name = "Big Hitbox",
+   Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Chungdz09/Script-chung-dz/refs/heads/main/Big%20Hitbox"))()
+   end,
+})
+
+local Button = MainTab:CreateButton({
    Name = "AimBot Press X On/Off",
    Callback = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Chungdz09/Script-chung-dz/refs/heads/main/KchungdzAimbot.lua"))()
