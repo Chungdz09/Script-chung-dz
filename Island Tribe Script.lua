@@ -45,7 +45,7 @@ local Button = MainTab:CreateButton({
   end,
 })
 
-Tab1:CreateButton({
+local Button = MainTab:CreateButton({
     Name = "Heal with Pumpkin if HP < 100 ",
     Callback = function()
         local Players = game:GetService("Players")
@@ -73,6 +73,7 @@ Tab1:CreateButton({
         end)
     end
 })
+
 local Button = MainTab:CreateButton({
    Name = "ESP",
    Callback = function()
