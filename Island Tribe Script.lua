@@ -623,38 +623,7 @@ local Section = Tab5:CreateSection("Open Chest")
 
 local Section = Tab5:CreateSection("Drop")
 
- local Button = Tab5:CreateButton({
-    Name = "Open Hard Chest",
-    Callback = function()
-        local chestID = 168
-        local action = "Open"
-        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
-
-        Event:FireServer(chestID, action)
-    end
-})
-
- local Button = Tab5:CreateButton({
-    Name = "Open Hard Chest",
-    Callback = function()
-        local chestID = 168
-        local action = "Open"
-        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
-
-        Event:FireServer(chestID, action)
-    end
-})
-
- local Button = Tab5:CreateButton({
-    Name = "Open Hard Chest",
-    Callback = function()
-        local chestID = 168
-        local action = "Open"
-        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
-
-        Event:FireServer(chestID, action)
-    end
-})
+ 
  local Button = Tab5:CreateButton({
     Name = "Leaderboard Place",
     Callback = function()
