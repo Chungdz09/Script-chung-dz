@@ -557,3 +557,80 @@ local Button = Tab4:CreateButton({
         end
     end,
  })
+local Tab5 = Window:CreateTab("Open Chest", nil)
+local Section = Tab5:CreateSection("Open Chest")
+
+ local Button = Tab5:CreateButton({
+    Name = "Open Easy Chest",
+    Callback = function()
+        local chestID = 166
+        local action = "Open"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+ local Button = Tab5:CreateButton({
+    Name = "Open Medium Chest",
+    Callback = function()
+        local chestID = 167
+        local action = "Open"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+ local Button = Tab5:CreateButton({
+    Name = "Open Hard Chest",
+    Callback = function()
+        local chestID = 168
+        local action = "Open"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+ local Button = Tab5:CreateButton({
+    Name = "Leaderboard Place",
+    Callback = function()
+        local player = game:GetService("Players").LocalPlayer
+        if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local myroot = player.Character.HumanoidRootPart
+            myroot.CFrame = CFrame.new(5313, 4, -5508)
+        else
+            warn("Player is not alive or character is not fully loaded.")
+        end
+    end
+})
+
+Tab5:CreateButton({
+    Name = "Heal with Pumpkin if HP < 100",
+    Callback = function()
+        local Players = game:GetService("Players")
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local LocalPlayer = Players.LocalPlayer
+        local Event = ReplicatedStorage.References.Comm.Events.InventoryInteraction
+        local itemID = 378  -- Pumpkin ID
+        local action = "Eat"
+
+        local function IsPlayerAlive()
+            return LocalPlayer and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") and LocalPlayer.Character.Humanoid.Health > 0
+        end
+
+        task.spawn(function()
+            while true do
+                task.wait(0.1)
+                if not IsPlayerAlive() then break end
+                local hum = LocalPlayer.Character.Humanoid
+                if hum.Health < 100 then
+                    Event:FireServer(itemID, action)
+                else
+                    break -- Stop healing once HP is 65 or higher
+                end
+            end
+        end)
+    end
+})
