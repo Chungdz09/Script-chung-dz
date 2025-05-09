@@ -686,3 +686,82 @@ local Section = Tab5:CreateSection("Drop")
         end
     end
 })
+
+ local Section = Tab5:CreateSection("Drop")
+
+local Button = Tab5:CreateButton({
+    Name = "Glider",
+    Callback = function()
+        local chestID = 301
+        local action = "Drop"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+local Button = Tab5:CreateButton({
+    Name = "Candy Pack",
+    Callback = function()
+        local chestID = 188
+        local action = "Drop"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+local Button = Tab5:CreateButton({
+    Name = "Warrior Pack",
+    Callback = function()
+        local chestID = 318
+        local action = "Drop"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+local Button = Tab5:CreateButton({
+    Name = "Fruit Pack",
+    Callback = function()
+        local chestID = 325
+        local action = "Drop"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+ local Button = Tab5:CreateButton({
+    Name = "Drop Easy Chest",
+    Callback = function()
+        local chestID = 166
+        local action = "Drop"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+ local Button = Tab5:CreateButton({
+    Name = "Drop Medium Chest",
+    Callback = function()
+        local chestID = 167
+        local action = "Drop"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+ local Button = Tab5:CreateButton({
+    Name = "Drop Hard Chest",
+    Callback = function()
+        local chestID = 168
+        local action = "Drop"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
