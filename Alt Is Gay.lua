@@ -46,9 +46,59 @@ local Button = MainTab:CreateButton({
 })
 
 local Button = MainTab:CreateButton({
+    Name = "Heal with Pumpkin if HP < 100 ",
+    Callback = function()
+        local Players = game:GetService("Players")
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local LocalPlayer = Players.LocalPlayer
+        local Event = ReplicatedStorage.References.Comm.Events.InventoryInteraction
+        local itemID = 378  -- Pumpkin ID
+        local action = "Eat"
+
+        local function IsPlayerAlive()
+            return LocalPlayer and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") and LocalPlayer.Character.Humanoid.Health > 0
+        end
+
+        task.spawn(function()
+            while true do
+                task.wait(0.1)
+                if not IsPlayerAlive() then break end
+                local hum = LocalPlayer.Character.Humanoid
+                if hum.Health < 100 then
+                    Event:FireServer(itemID, action)
+                else
+                    break -- Stop healing once HP is 65 or higher
+                end
+            end
+        end)
+    end
+})
+
+local Button = MainTab:CreateButton({
    Name = "ESP",
    Callback = function()
     loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/WRD%20ESP.txt"))()
+   end,
+})
+
+local Button = MainTab:CreateButton({
+   Name = "Big Hitbox",
+   Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Chungdz09/Script-chung-dz/refs/heads/main/Big%20Hitbox"))()
+   end,
+})
+
+local Button = MainTab:CreateButton({
+   Name = "AimBot Press X On/Off",
+   Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Chungdz09/Script-chung-dz/refs/heads/main/KchungdzAimbot.lua"))()
+   end,
+})
+
+local Button = MainTab:CreateButton({
+   Name = "AimBotFOV Press F On/Off",
+   Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Chungdz09/Script-chung-dz/refs/heads/main/AimbotScriptFOV.lua"))()
    end,
 })
 
@@ -369,7 +419,7 @@ local Button = Tab4:CreateButton({
      local putIn = true
      local itemIDs = {}
       
-      for i = 1, 250 do
+      for i = 1, 500 do
           table.insert(itemIDs, 188)
       end
       
@@ -393,6 +443,25 @@ local Button = Tab4:CreateButton({
           Event:FireServer(chest, putIn, itemID)
       end
   end,
+})
+
+local Button = Tab4:CreateButton({
+   Name = "Zen Pack 500x",
+   Callback = function()
+     local localChest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
+     local putIn = true
+     local itemIDs = {}
+      
+      for i = 1, 500 do
+          table.insert(itemIDs, 327)
+      end
+      
+      local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+      
+      for _, itemID in ipairs(itemIDs) do
+          Event:FireServer(localChest, putIn, itemID)
+      end
+ end,
 })
 
 local Section = Tab4:CreateSection("Glider")
@@ -486,13 +555,13 @@ local Button = Tab4:CreateButton({
  })
 
 local Button = Tab4:CreateButton({
-   Name = "Easter Candy",
+   Name = "Easter Candy (500)",
    Callback = function()
      local localChest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
      local putIn = true
      local itemIDs = {}
       
-      for i = 1, 250 do
+      for i = 1, 500 do
           table.insert(itemIDs, 271)
       end
       
@@ -502,4 +571,148 @@ local Button = Tab4:CreateButton({
           Event:FireServer(localChest, putIn, itemID)
       end
  end,
+})
+
+local Button = Tab4:CreateButton({
+    Name = "Starter Pack Duping",
+    Callback = function()
+        local chest = game:GetService("Workspace").Replicators.NonPassive["Moonstone Storage Chest"]
+        local putIn = true
+        local itemIDs = {354, 355, 356, 357, 358, 359}
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+    
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+ })
+local Tab5 = Window:CreateTab("Open Chest", nil)
+local Section = Tab5:CreateSection("Open Chest")
+
+ local Button = Tab5:CreateButton({
+    Name = "Open Easy Chest",
+    Callback = function()
+        local chestID = 166
+        local action = "Open"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+ local Button = Tab5:CreateButton({
+    Name = "Open Medium Chest",
+    Callback = function()
+        local chestID = 167
+        local action = "Open"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+ local Button = Tab5:CreateButton({
+    Name = "Open Hard Chest",
+    Callback = function()
+        local chestID = 168
+        local action = "Open"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+local Section = Tab5:CreateSection("Drop")
+
+ 
+ local Button = Tab5:CreateButton({
+    Name = "Leaderboard Place",
+    Callback = function()
+        local player = game:GetService("Players").LocalPlayer
+        if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local myroot = player.Character.HumanoidRootPart
+            myroot.CFrame = CFrame.new(5313, 4, -5508)
+        else
+            warn("Player is not alive or character is not fully loaded.")
+        end
+    end
+})
+
+ local Section = Tab5:CreateSection("Drop")
+
+local Button = Tab5:CreateButton({
+    Name = "Glider",
+    Callback = function()
+        local chestID = 301
+        local action = "Drop"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+local Button = Tab5:CreateButton({
+    Name = "Candy Pack",
+    Callback = function()
+        local chestID = 188
+        local action = "Drop"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+local Button = Tab5:CreateButton({
+    Name = "Warrior Pack",
+    Callback = function()
+        local chestID = 318
+        local action = "Drop"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+local Button = Tab5:CreateButton({
+    Name = "Fruit Pack",
+    Callback = function()
+        local chestID = 325
+        local action = "Drop"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+ local Button = Tab5:CreateButton({
+    Name = "Drop Easy Chest",
+    Callback = function()
+        local chestID = 166
+        local action = "Drop"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+ local Button = Tab5:CreateButton({
+    Name = "Drop Medium Chest",
+    Callback = function()
+        local chestID = 167
+        local action = "Drop"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+ local Button = Tab5:CreateButton({
+    Name = "Drop Hard Chest",
+    Callback = function()
+        local chestID = 168
+        local action = "Drop"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
 })
