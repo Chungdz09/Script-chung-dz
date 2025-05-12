@@ -213,6 +213,29 @@ local Button = Tab2:CreateButton({
     end,
 })
  
+ local Button = Tab2:CreateButton({
+    Name = "📦Putout Chest pack 25x",
+    Callback = function()
+        local chest = GetClosestChest()
+        if not chest then
+            warn("No nearby chest found.")
+            return
+        end
+
+        local putIn = true
+        local itemIDs = {382}
+        
+        for i = 1, 24 do
+            table.insert(itemIDs, 382)
+        end
+        local Event = ReplicatedStorage.References.Comm.Events.UpdateStorageChest
+
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, PutOut, itemID)
+        end
+    end,
+})
+ 
 local Button = Tab2:CreateButton({
     Name = "🍭Candypack 500x 😊",
     Callback = function()
@@ -377,25 +400,34 @@ local Section = Tab3:CreateSection("Gliders 🪁")
  local Button = Tab3:CreateButton({
     Name = "🪁Easter Glider🪁",
     Callback = function()
-        local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
-        local putIn = true
-        local itemIDs = {272}
-        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+         local chest = GetClosestChest()
+        if not chest then
+            warn("No nearby chest found.")
+            return
+        end
     
+          local putIn = true
+        local itemIDs = {272}
+        local Event = ReplicatedStorage.References.Comm.Events.UpdateStorageChest
         for _, itemID in ipairs(itemIDs) do
             Event:FireServer(chest, putIn, itemID)
         end
     end,
  })
 
+
  local Button = Tab3:CreateButton({
     Name = "🪁Glider🪁",
     Callback = function()
-        local chest = game:GetService("Workspace").Replicators.NonPassive["Wood Storage Chest"]
-        local putIn = true
-        local itemIDs = {301}
-        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.UpdateStorageChest
+         local chest = GetClosestChest()
+        if not chest then
+            warn("No nearby chest found.")
+            return
+        end
     
+          local putIn = true
+        local itemIDs = {301}
+        local Event = ReplicatedStorage.References.Comm.Events.UpdateStorageChest
         for _, itemID in ipairs(itemIDs) do
             Event:FireServer(chest, putIn, itemID)
         end
@@ -512,7 +544,7 @@ local Button = Tab3:CreateButton({
         local putIn = true
         local itemIDs = {271}
         
-        for i = 1, 499 do
+        for i = 1, 500 do
             table.insert(itemIDs, 271)
         end
         local Event = ReplicatedStorage.References.Comm.Events.UpdateStorageChest
@@ -523,6 +555,53 @@ local Button = Tab3:CreateButton({
     end,
 })
  
+ local Button = Tab3:CreateButton({
+   Name =   "Pumpkin 500x",
+   Callback = function()
+        local chest = GetClosestChest()
+        if not chest then
+            warn("No nearby chest found.")
+            return
+        end
+
+        local putIn = true
+        local itemIDs = {378}
+        
+        for i = 1, 500 do
+            table.insert(itemIDs, 378)
+        end
+        local Event = ReplicatedStorage.References.Comm.Events.UpdateStorageChest
+
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+})
+
+ local Button = Tab3:CreateButton({
+   Name =   "PutOut Pumpkin 500x",
+   Callback = function()
+        local chest = GetClosestChest()
+        if not chest then
+            warn("No nearby chest found.")
+            return
+        end
+
+        local putIn = true
+        local itemIDs = {378}
+        
+        for i = 1, 500 do
+            table.insert(itemIDs, 378)
+        end
+        local Event = ReplicatedStorage.References.Comm.Events.UpdateStorageChest
+
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, PutOut, itemID)
+        end
+    end,
+})
+ 
+
 local Tab4 = Window:CreateTab("Armor And Sword,Bow", nil)
 local Section = Tab4:CreateSection("Armor")
 
@@ -642,7 +721,7 @@ local Button = Tab4:CreateButton({
     end,
 })
 
-local Tab5 = Window:CreateTab("Open Chest", nil)
+local Tab5 = Window:CreateTab("Open And Drop", nil)
 local Section = Tab5:CreateSection("Open Chest")
 
  local Button = Tab5:CreateButton({
@@ -788,6 +867,17 @@ local Button = Tab5:CreateButton({
     Name = "Drop Lunar Arrow",
     Callback = function()
         local chestID = 377
+        local action = "Drop"
+        local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
+
+        Event:FireServer(chestID, action)
+    end
+})
+
+local Button = Tab5:CreateButton({
+    Name = "Ob Snowball",
+    Callback = function()
+        local chestID = 352
         local action = "Drop"
         local Event = game:GetService("ReplicatedStorage").References.Comm.Events.InventoryInteraction
 
