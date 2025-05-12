@@ -305,7 +305,7 @@ local Button = Tab2:CreateButton({
     end,
 })
 
-local Button = Tab4:CreateButton({
+local Button = Tab2:CreateButton({
    Name = "Zen Pack 500x",
    Callback = function()
      local localChest = game:GetService("Workspace").Replicators.NonPassive["Obsidian Storage Chest"]
