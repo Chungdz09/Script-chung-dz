@@ -136,7 +136,8 @@ local Button = MainTab:CreateButton({
 local Button = MainTab:CreateButton({
    Name = "AimBotFOV Press F On/Off",
    Callback = function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Chungdz09/Script-chung-dz/refs/heads/main/AimbotScriptFOV.lua"))()
+    local Aimbot = loadstring(game:HttpGet("https://raw.githubusercontent.com/Exunys/Aimbot-V3/main/src/Aimbot.lua"))()
+Aimbot.Load()
    end,
 })
 
@@ -582,7 +583,7 @@ local Button = Tab3:CreateButton({
         local putIn = true
         local itemIDs = {378}
         
-        for i = 1, 500 do
+        for i = 1, 499 do
             table.insert(itemIDs, 378)
         end
         local Event = ReplicatedStorage.References.Comm.Events.UpdateStorageChest
@@ -605,7 +606,7 @@ local Button = Tab3:CreateButton({
         local putIn = true
         local itemIDs = {378}
         
-        for i = 1, 500 do
+        for i = 1, 499 do
             table.insert(itemIDs, 378)
         end
         local Event = ReplicatedStorage.References.Comm.Events.UpdateStorageChest
@@ -616,7 +617,52 @@ local Button = Tab3:CreateButton({
     end,
 })
  
+ local Button = Tab3:CreateButton({
+   Name =   "Hard Chest 25x",
+   Callback = function()
+        local chest = GetClosestChest()
+        if not chest then
+            warn("No nearby chest found.")
+            return
+        end
 
+        local putIn = true
+        local itemIDs = {168}
+        
+        for i = 1, 24 do
+            table.insert(itemIDs, 168)
+        end
+        local Event = ReplicatedStorage.References.Comm.Events.UpdateStorageChest
+
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+})
+
+ local Button = Tab3:CreateButton({
+   Name =   "PutOut Hard Chest 25x",
+   Callback = function()
+        local chest = GetClosestChest()
+        if not chest then
+            warn("No nearby chest found.")
+            return
+        end
+
+        local putIn = true
+        local itemIDs = {168}
+        
+        for i = 1, 24 do
+            table.insert(itemIDs, 168)
+        end
+        local Event = ReplicatedStorage.References.Comm.Events.UpdateStorageChest
+
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, PutOut, itemID)
+        end
+    end,
+})
+ 
 local Tab4 = Window:CreateTab("Armor And Sword,Bow", nil)
 local Section = Tab4:CreateSection("Armor")
 
