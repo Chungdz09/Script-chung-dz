@@ -87,3 +87,9 @@ RunService.RenderStepped:Connect(function()
         camera.CFrame = camera.CFrame:Lerp(targetCFrame, rotationSpeed)
     end
 end)
+
+game.StarterGui:SetCore("SendNotification", {
+	Title = "Working.",
+	Text = "Success, Script Loaded.",
+	Duration = 4,
+})
