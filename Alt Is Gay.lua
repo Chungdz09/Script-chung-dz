@@ -182,12 +182,27 @@ local Section = Tab2:CreateSection("Start Duping items")
 
 
 local Button = Tab2:CreateButton({
-    Name = "🏁Start Dupe",
+    Name = "🏁 Start Dupe",
     Callback = function()
+        -- Gửi thông báo khi nhấn Start Dupe
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Dupe Started",
+            Text = "Dupe process has started successfully.",
+            Duration = 4,  -- Thời gian hiển thị thông báo (4 giây)
+        })
+        
+        -- Gửi sự kiện SetSettings đến server (điều này có thể liên quan đến dupe)
         getgenv().olddata = game:GetService("ReplicatedStorage").References.Comm.Events.SetSettings
-        game:GetService("ReplicatedStorage").References.Comm.Events.SetSettings:FireServer(getgenv().olddata)    
+        game:GetService("ReplicatedStorage").References.Comm.Events.SetSettings:FireServer(getgenv().olddata)
     end,
- })
+})
+
+-- Thông báo thông báo khi script được tải thành công
+game.StarterGui:SetCore("SendNotification", {
+    Title = "Script Loaded",
+    Text = "Dupe Script Loaded Successfully.",
+    Duration = 4,
+})
 
 local Section = Tab2:CreateSection("Packs") 
 local Button = Tab2:CreateButton({
