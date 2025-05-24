@@ -1,0 +1,151 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+
+-- Configuration
+local lockRange = 2000 -- studs
+local rotationSpeed = 1
+local toggleKey = Enum.KeyCode.F
+local fovAngle = 15 -- degrees
+local visualFovRadius = 100 -- pixels
+local maxTargetSpeed = 100 -- studs/second
+
+-- Variables
+local localPlayer = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+local lockedPlayer = nil
+local lockingOn = false
+local lockEnabled = true
+local previousTargetPosition = nil
+
+-- Drawing FOV Circle
+local fovCircle = Drawing.new("Circle")
+fovCircle.Color = Color3.fromRGB(255, 0, 0)
+fovCircle.Thickness = 2
+fovCircle.Radius = visualFovRadius
+fovCircle.Filled = false
+fovCircle.Transparency = 1
+fovCircle.Visible = true
+
+-- Find nearest player within range and FOV
+local function findNearestPlayerInFOV()
+	local nearest = nil
+	local shortestDistance = lockRange
+
+	if not localPlayer.Character or not localPlayer.Character:FindFirstChild("Head") then
+		return nil
+	end
+
+	local localPos = localPlayer.Character.Head.Position
+	local camLook = camera.CFrame.LookVector
+
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= localPlayer and player.Team ~= localPlayer.Team then
+			if player.Character and player.Character:FindFirstChild("Head") then
+				local targetPos = player.Character.Head.Position
+				local distance = (targetPos - localPos).Magnitude
+
+				if distance < shortestDistance then
+					local dirToTarget = (targetPos - localPos).Unit
+					local angle = math.deg(math.acos(camLook:Dot(dirToTarget)))
+
+					if angle < fovAngle then
+						shortestDistance = distance
+						nearest = player
+					end
+				end
+			end
+		end
+	end
+
+	return nearest
+end
+
+-- Lock functions
+local function lockOn()
+	lockedPlayer = findNearestPlayerInFOV()
+	if lockedPlayer then
+		lockingOn = true
+		previousTargetPosition = nil
+		print("Locked on:", lockedPlayer.Name)
+	else
+		print("No target in range or FOV.")
+	end
+end
+
+local function releaseLock()
+	lockingOn = false
+	lockedPlayer = nil
+	previousTargetPosition = nil
+end
+
+local function toggleLock()
+	lockEnabled = not lockEnabled
+	if not lockEnabled then
+		releaseLock()
+	end
+	print("Lock enabled:", lockEnabled)
+end
+
+-- Input handlers
+UserInputService.InputBegan:Connect(function(input, gp)
+	if not gp then
+		if input.UserInputType == Enum.UserInputType.MouseButton2 and lockEnabled then
+			lockOn()
+		elseif input.KeyCode == toggleKey then
+			toggleLock()
+		end
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input, gp)
+	if input.UserInputType == Enum.UserInputType.MouseButton2 then
+		releaseLock()
+	end
+end)
+
+-- Update loop
+RunService.RenderStepped:Connect(function(deltaTime)
+	local mousePos = UserInputService:GetMouseLocation()
+	fovCircle.Position = Vector2.new(mousePos.X, mousePos.Y)
+
+	if lockEnabled and lockingOn and lockedPlayer and lockedPlayer.Character and lockedPlayer.Character:FindFirstChild("Head") then
+		local head = lockedPlayer.Character.Head
+		local humanoid = lockedPlayer.Character:FindFirstChildOfClass("Humanoid")
+
+		-- Dừng nếu chết hoặc đổi team
+		if not humanoid or humanoid.Health <= 0 or lockedPlayer.Team == localPlayer.Team then
+			print("Target is dead or changed team.")
+			releaseLock()
+			return
+		end
+
+		local currentPos = head.Position
+
+		-- Dừng nếu di chuyển quá nhanh
+		if previousTargetPosition then
+			local speed = (currentPos - previousTargetPosition).Magnitude / deltaTime
+			if speed > maxTargetSpeed then
+				print("Target moving too fast:", speed)
+				releaseLock()
+				return
+			end
+		end
+
+		previousTargetPosition = currentPos
+
+		-- Lock-on camera
+		local direction = (currentPos - camera.CFrame.Position).Unit
+		local targetCFrame = CFrame.new(camera.CFrame.Position, camera.CFrame.Position + direction)
+		camera.CFrame = camera.CFrame:Lerp(targetCFrame, rotationSpeed)
+	else
+		previousTargetPosition = nil
+	end
+end)
+
+-- Dừng nếu người chơi bị khóa rời game
+Players.PlayerRemoving:Connect(function(player)
+	if player == lockedPlayer then
+		releaseLock()
+	end
+end)
