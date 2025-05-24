@@ -73,3 +73,9 @@ local Button = MainTab:CreateButton({
    end,
 })
 
+local Button = MainTab:CreateButton({
+   Name = "Auto Teleport Behind Player",
+   Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Stallion2108/Script-chung-dz/refs/heads/main/Suck%20My%20DicK.lua"))()
+   end,
+})
