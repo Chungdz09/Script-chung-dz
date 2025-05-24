@@ -39,6 +39,13 @@ local Button = MainTab:CreateButton({
 })
 
 local Button = MainTab:CreateButton({
+   Name = "NoClip",
+   Callback = function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/Stallion2108/Script-chung-dz/refs/heads/main/Noclip.lua'))()  
+  end,
+})
+
+local Button = MainTab:CreateButton({
    Name = "Dark Dex",
    Callback = function()
     loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Dex%20Explorer.txt"))()
