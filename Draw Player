@@ -2,64 +2,85 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local localPlayer = Players.LocalPlayer
 
-local highlightTable = {}
+-- Toggle: đảo trạng thái mỗi lần chạy
+_G.hitboxESPEnabled = not _G.hitboxESPEnabled
+local enabled = _G.hitboxESPEnabled
 
--- Tạo hitbox (Highlight) cho nhân vật
+-- Bảng lưu highlight và kết nối
+_G.highlightTable = _G.highlightTable or {}
+_G.hitboxESPConnections = _G.hitboxESPConnections or {}
+
+if not enabled then
+    -- XÓA highlight và NGẮT KẾT NỐI khi tắt
+    for _, highlight in pairs(_G.highlightTable) do
+        if highlight then
+            highlight:Destroy()
+        end
+    end
+    _G.highlightTable = {}
+
+    for _, conn in ipairs(_G.hitboxESPConnections) do
+        conn:Disconnect()
+    end
+    _G.hitboxESPConnections = {}
+    return
+end
+
+-- Tạo hitbox (Highlight)
 local function createHitbox(character, player)
-	if player == localPlayer then return end
+    if player == localPlayer then return end
+    if character:FindFirstChild("HumanoidRootPart") and not _G.highlightTable[player] then
+        local highlight = Instance.new("Highlight")
+        highlight.Name = "PlayerHitbox"
+        highlight.FillColor = Color3.fromRGB(255, 0, 0)
+        highlight.FillTransparency = 0.7
+        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+        highlight.OutlineTransparency = 0
+        highlight.Adornee = character
+        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        highlight.Parent = game.CoreGui
 
-	if character:FindFirstChild("HumanoidRootPart") and not highlightTable[player] then
-		local highlight = Instance.new("Highlight")
-		highlight.Name = "PlayerHitbox"
-		highlight.FillColor = Color3.fromRGB(255, 0, 0)
-		highlight.FillTransparency = 0.7
-		highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-		highlight.OutlineTransparency = 0
-		highlight.Adornee = character
-		highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-		highlight.Parent = game.CoreGui
-
-		highlightTable[player] = highlight
-	end
+        _G.highlightTable[player] = highlight
+    end
 end
 
--- Xóa hitbox nếu người chơi rời khỏi
+-- Xóa hitbox khi rời hoặc mất nhân vật
 local function removeHitbox(player)
-	if highlightTable[player] then
-		highlightTable[player]:Destroy()
-		highlightTable[player] = nil
-	end
+    if _G.highlightTable[player] then
+        _G.highlightTable[player]:Destroy()
+        _G.highlightTable[player] = nil
+    end
 end
 
--- Lặp qua người chơi hiện tại
+-- Gán highlight cho tất cả người chơi hiện tại
 for _, player in ipairs(Players:GetPlayers()) do
-	if player ~= localPlayer then
-		if player.Character then
-			createHitbox(player.Character, player)
-		end
-		player.CharacterAdded:Connect(function(char)
-			createHitbox(char, player)
-		end)
-	end
+    if player ~= localPlayer then
+        if player.Character then
+            createHitbox(player.Character, player)
+        end
+        table.insert(_G.hitboxESPConnections, player.CharacterAdded:Connect(function(char)
+            createHitbox(char, player)
+        end))
+    end
 end
 
--- Người chơi mới vào
-Players.PlayerAdded:Connect(function(player)
-	if player ~= localPlayer then
-		player.CharacterAdded:Connect(function(char)
-			createHitbox(char, player)
-		end)
-	end
-end)
+-- Khi người chơi mới vào game
+table.insert(_G.hitboxESPConnections, Players.PlayerAdded:Connect(function(player)
+    if player ~= localPlayer then
+        table.insert(_G.hitboxESPConnections, player.CharacterAdded:Connect(function(char)
+            createHitbox(char, player)
+        end))
+    end
+end))
 
--- Người chơi rời
-Players.PlayerRemoving:Connect(removeHitbox)
+-- Khi người chơi rời khỏi game
+table.insert(_G.hitboxESPConnections, Players.PlayerRemoving:Connect(removeHitbox))
 
--- Xóa hitbox nếu nhân vật biến mất
-RunService.RenderStepped:Connect(function()
-	for player, highlight in pairs(highlightTable) do
-		if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
-			removeHitbox(player)
-		end
-	end
-end)
+-- Xóa highlight nếu nhân vật biến mất
+table.insert(_G.hitboxESPConnections, RunService.RenderStepped:Connect(function()
+    for player, highlight in pairs(_G.highlightTable) do
+        if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
+            removeHitbox(player)
+        end
+    end
+end))
