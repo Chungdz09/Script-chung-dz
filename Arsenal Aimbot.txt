@@ -126,3 +126,11 @@ RunService:BindToRenderStep("LockOnSystem", Enum.RenderPriority.Camera.Value + 1
         camera.CFrame = camera.CFrame:Lerp(targetCFrame, rotationSpeed)
     end
 end)
+
+pcall(function()
+	game.StarterGui:SetCore("SendNotification", {
+		Title = "Auto Lock-On",
+		Text = "Loaded. Press F to toggle.",
+		Duration = 4,
+	})
+end)
