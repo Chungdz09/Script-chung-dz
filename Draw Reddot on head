@@ -1,12 +1,31 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
 local localPlayer = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
-local dots = {}
+-- Biến toggle
+_G.dotESPEnabled = not _G.dotESPEnabled -- bật/tắt mỗi lần chạy
+local enabled = _G.dotESPEnabled
 
--- Tạo dấu chấm cho 1 người chơi
+-- Biến lưu dấu chấm và kết nối
+_G.dotESPConnections = _G.dotESPConnections or {}
+_G.dotESPObjects = _G.dotESPObjects or {}
+
+if not enabled then
+	-- Nếu tắt -> xóa toàn bộ dấu chấm và ngưng kết nối
+	for _, dot in pairs(_G.dotESPObjects) do
+		dot:Remove()
+	end
+	_G.dotESPObjects = {}
+
+	for _, connection in pairs(_G.dotESPConnections) do
+		connection:Disconnect()
+	end
+	_G.dotESPConnections = {}
+	return
+end
+
+-- Tạo dấu chấm
 local function createDot(player)
 	if player == localPlayer then return end
 
@@ -17,37 +36,33 @@ local function createDot(player)
 	dot.Transparency = 1
 	dot.Visible = false
 
-	dots[player] = dot
+	_G.dotESPObjects[player] = dot
 end
 
--- Xóa dấu chấm khi người chơi rời
+-- Xoá dấu chấm khi người chơi rời
 local function removeDot(player)
-	if dots[player] then
-		dots[player]:Remove()
-		dots[player] = nil
+	if _G.dotESPObjects[player] then
+		_G.dotESPObjects[player]:Remove()
+		_G.dotESPObjects[player] = nil
 	end
 end
 
--- Tạo dấu chấm cho tất cả người chơi hiện tại ngoại trừ bạn
+-- Tạo dấu chấm cho tất cả người chơi hiện tại
 for _, player in pairs(Players:GetPlayers()) do
-	if player ~= localPlayer then
-		createDot(player)
-	end
+	createDot(player)
 end
 
--- Tạo dấu chấm khi người chơi mới vào
-Players.PlayerAdded:Connect(function(player)
-	if player ~= localPlayer then
-		createDot(player)
-	end
-end)
+-- Kết nối sự kiện thêm người chơi
+table.insert(_G.dotESPConnections, Players.PlayerAdded:Connect(function(player)
+	createDot(player)
+end))
 
--- Xóa dấu chấm khi người chơi rời
-Players.PlayerRemoving:Connect(removeDot)
+-- Kết nối sự kiện xoá người chơi
+table.insert(_G.dotESPConnections, Players.PlayerRemoving:Connect(removeDot))
 
--- Cập nhật vị trí dấu chấm mỗi frame
-RunService.RenderStepped:Connect(function()
-	for player, dot in pairs(dots) do
+-- Cập nhật vị trí mỗi frame
+table.insert(_G.dotESPConnections, RunService.RenderStepped:Connect(function()
+	for player, dot in pairs(_G.dotESPObjects) do
 		local character = player.Character
 		if character and character:FindFirstChild("Head") then
 			local headPos = character.Head.Position
@@ -62,4 +77,4 @@ RunService.RenderStepped:Connect(function()
 			dot.Visible = false
 		end
 	end
-end)
+end))
