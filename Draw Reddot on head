@@ -1,0 +1,65 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local localPlayer = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+local dots = {}
+
+-- Tạo dấu chấm cho 1 người chơi
+local function createDot(player)
+	if player == localPlayer then return end
+
+	local dot = Drawing.new("Circle")
+	dot.Radius = 5
+	dot.Color = Color3.fromRGB(255, 0, 0)
+	dot.Filled = true
+	dot.Transparency = 1
+	dot.Visible = false
+
+	dots[player] = dot
+end
+
+-- Xóa dấu chấm khi người chơi rời
+local function removeDot(player)
+	if dots[player] then
+		dots[player]:Remove()
+		dots[player] = nil
+	end
+end
+
+-- Tạo dấu chấm cho tất cả người chơi hiện tại ngoại trừ bạn
+for _, player in pairs(Players:GetPlayers()) do
+	if player ~= localPlayer then
+		createDot(player)
+	end
+end
+
+-- Tạo dấu chấm khi người chơi mới vào
+Players.PlayerAdded:Connect(function(player)
+	if player ~= localPlayer then
+		createDot(player)
+	end
+end)
+
+-- Xóa dấu chấm khi người chơi rời
+Players.PlayerRemoving:Connect(removeDot)
+
+-- Cập nhật vị trí dấu chấm mỗi frame
+RunService.RenderStepped:Connect(function()
+	for player, dot in pairs(dots) do
+		local character = player.Character
+		if character and character:FindFirstChild("Head") then
+			local headPos = character.Head.Position
+			local screenPos, onScreen = camera:WorldToViewportPoint(headPos)
+			if onScreen then
+				dot.Position = Vector2.new(screenPos.X, screenPos.Y)
+				dot.Visible = true
+			else
+				dot.Visible = false
+			end
+		else
+			dot.Visible = false
+		end
+	end
+end)
