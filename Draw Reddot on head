@@ -78,3 +78,11 @@ table.insert(_G.dotESPConnections, RunService.RenderStepped:Connect(function()
 		end
 	end
 end))
+
+pcall(function()
+	game.StarterGui:SetCore("SendNotification", {
+		Title = "Draw Reddot on head",
+		Text = "Loaded. Press it 1 more time to turn on/off.",
+		Duration = 4,
+	})
+end)
