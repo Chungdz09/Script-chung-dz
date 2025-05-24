@@ -3,7 +3,6 @@ local RunService = game:GetService("RunService")
 local localPlayer = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
--- Danh sách các khớp xương (nối các bộ phận cơ thể)
 local bones = {
 	{"Head", "UpperTorso"},
 	{"UpperTorso", "LowerTorso"},
@@ -21,85 +20,111 @@ local bones = {
 	{"RightLowerLeg", "RightFoot"},
 }
 
--- Tạo table chứa tất cả các line
-local skeletons = {}
+-- Toggle bật/tắt ESP mỗi lần chạy lại script
+_G.skeletonESPEnabled = not _G.skeletonESPEnabled
+local enabled = _G.skeletonESPEnabled
 
--- Hàm tạo line cho người chơi
+-- Lưu skeletons và connection
+_G.skeletons = _G.skeletons or {}
+_G.skeletonESPConnection = _G.skeletonESPConnection
+
+if _G.skeletonESPConnection then
+	_G.skeletonESPConnection:Disconnect()
+	_G.skeletonESPConnection = nil
+end
+
+-- Hàm xoá hết skeletons
+local function clearSkeletons()
+	for player, lines in pairs(_G.skeletons) do
+		for _, line in pairs(lines) do
+			if line then
+				line:Remove()
+			end
+		end
+	end
+	_G.skeletons = {}
+end
+
+if not enabled then
+	clearSkeletons()
+	return
+end
+
+-- Tạo skeleton cho player
 local function createSkeleton(player)
 	if player == localPlayer then return end
-	skeletons[player] = {}
+	_G.skeletons[player] = _G.skeletons[player] or {}
+end
 
-	RunService.RenderStepped:Connect(function()
+-- Xóa skeleton khi player rời
+local function removeSkeleton(player)
+	if _G.skeletons[player] then
+		for _, line in pairs(_G.skeletons[player]) do
+			if line then line:Remove() end
+		end
+		_G.skeletons[player] = nil
+	end
+end
+
+-- Update vị trí skeleton mỗi frame
+_G.skeletonESPConnection = RunService.RenderStepped:Connect(function()
+	for player, lines in pairs(_G.skeletons) do
 		local character = player.Character
-		if not character or not character:FindFirstChild("Head") then return end
-		if not character:FindFirstChild("Humanoid") or character:FindFirstChildOfClass("Humanoid").Health <= 0 then
-			for _, line in pairs(skeletons[player]) do
+		if not character or not character:FindFirstChild("Head") then
+			for _, line in pairs(lines) do
 				line.Visible = false
 			end
-			return
+			continue
+		end
+		local humanoid = character:FindFirstChildOfClass("Humanoid")
+		if not humanoid or humanoid.Health <= 0 then
+			for _, line in pairs(lines) do
+				line.Visible = false
+			end
+			continue
 		end
 
-		-- Cập nhật hoặc tạo lại line
 		for i, pair in ipairs(bones) do
 			local part0 = character:FindFirstChild(pair[1])
 			local part1 = character:FindFirstChild(pair[2])
-
 			if part0 and part1 then
 				local screenPos0, onScreen0 = camera:WorldToViewportPoint(part0.Position)
 				local screenPos1, onScreen1 = camera:WorldToViewportPoint(part1.Position)
-
 				if onScreen0 and onScreen1 then
-					local line = skeletons[player][i]
+					local line = lines[i]
 					if not line then
 						line = Drawing.new("Line")
 						line.Color = Color3.fromRGB(0, 255, 0)
 						line.Thickness = 1.5
 						line.Transparency = 1
-						skeletons[player][i] = line
+						lines[i] = line
 					end
 					line.From = Vector2.new(screenPos0.X, screenPos0.Y)
 					line.To = Vector2.new(screenPos1.X, screenPos1.Y)
 					line.Visible = true
 				else
-					if skeletons[player][i] then
-						skeletons[player][i].Visible = false
+					if lines[i] then
+						lines[i].Visible = false
 					end
 				end
 			end
 		end
-	end)
-end
-
--- Xóa xương khi người chơi rời
-local function removeSkeleton(player)
-	if skeletons[player] then
-		for _, line in pairs(skeletons[player]) do
-			if line then line:Remove() end
-		end
-		skeletons[player] = nil
-	end
-end
-
--- Gán xương cho người chơi hiện tại
-for _, player in pairs(Players:GetPlayers()) do
-	if player ~= localPlayer then
-		if player.Character then
-			createSkeleton(player)
-		end
-		player.CharacterAdded:Connect(function()
-			createSkeleton(player)
-		end)
-	end
-end
-
--- Người chơi mới vào
-Players.PlayerAdded:Connect(function(player)
-	if player ~= localPlayer then
-		player.CharacterAdded:Connect(function()
-			createSkeleton(player)
-		end)
 	end
 end)
 
--- Người chơi rời game
+-- Khởi tạo skeleton cho tất cả người chơi hiện tại
+for _, player in pairs(Players:GetPlayers()) do
+	if player ~= localPlayer then
+		createSkeleton(player)
+	end
+end
+
+-- Thêm skeleton khi người chơi mới vào
+Players.PlayerAdded:Connect(function(player)
+	if player ~= localPlayer then
+		createSkeleton(player)
+	end
+end)
+
+-- Xoá skeleton khi người chơi rời
 Players.PlayerRemoving:Connect(removeSkeleton)
