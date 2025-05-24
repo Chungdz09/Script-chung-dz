@@ -1,44 +1,93 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local localPlayer = Players.LocalPlayer
+local camera = workspace.CurrentCamera
 
-local highlightTable = {}
+-- Danh sách các khớp xương (nối các bộ phận cơ thể)
+local bones = {
+	{"Head", "UpperTorso"},
+	{"UpperTorso", "LowerTorso"},
+	{"UpperTorso", "LeftUpperArm"},
+	{"LeftUpperArm", "LeftLowerArm"},
+	{"LeftLowerArm", "LeftHand"},
+	{"UpperTorso", "RightUpperArm"},
+	{"RightUpperArm", "RightLowerArm"},
+	{"RightLowerArm", "RightHand"},
+	{"LowerTorso", "LeftUpperLeg"},
+	{"LeftUpperLeg", "LeftLowerLeg"},
+	{"LeftLowerLeg", "LeftFoot"},
+	{"LowerTorso", "RightUpperLeg"},
+	{"RightUpperLeg", "RightLowerLeg"},
+	{"RightLowerLeg", "RightFoot"},
+}
 
--- Tạo hitbox (Highlight) cho nhân vật
-local function createHitbox(character, player)
+-- Tạo table chứa tất cả các line
+local skeletons = {}
+
+-- Hàm tạo line cho người chơi
+local function createSkeleton(player)
 	if player == localPlayer then return end
+	skeletons[player] = {}
 
-	if character:FindFirstChild("HumanoidRootPart") and not highlightTable[player] then
-		local highlight = Instance.new("Highlight")
-		highlight.Name = "PlayerHitbox"
-		highlight.FillColor = Color3.fromRGB(255, 0, 0)
-		highlight.FillTransparency = 0.7
-		highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-		highlight.OutlineTransparency = 0
-		highlight.Adornee = character
-		highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-		highlight.Parent = game.CoreGui
+	RunService.RenderStepped:Connect(function()
+		local character = player.Character
+		if not character or not character:FindFirstChild("Head") then return end
+		if not character:FindFirstChild("Humanoid") or character:FindFirstChildOfClass("Humanoid").Health <= 0 then
+			for _, line in pairs(skeletons[player]) do
+				line.Visible = false
+			end
+			return
+		end
 
-		highlightTable[player] = highlight
+		-- Cập nhật hoặc tạo lại line
+		for i, pair in ipairs(bones) do
+			local part0 = character:FindFirstChild(pair[1])
+			local part1 = character:FindFirstChild(pair[2])
+
+			if part0 and part1 then
+				local screenPos0, onScreen0 = camera:WorldToViewportPoint(part0.Position)
+				local screenPos1, onScreen1 = camera:WorldToViewportPoint(part1.Position)
+
+				if onScreen0 and onScreen1 then
+					local line = skeletons[player][i]
+					if not line then
+						line = Drawing.new("Line")
+						line.Color = Color3.fromRGB(0, 255, 0)
+						line.Thickness = 1.5
+						line.Transparency = 1
+						skeletons[player][i] = line
+					end
+					line.From = Vector2.new(screenPos0.X, screenPos0.Y)
+					line.To = Vector2.new(screenPos1.X, screenPos1.Y)
+					line.Visible = true
+				else
+					if skeletons[player][i] then
+						skeletons[player][i].Visible = false
+					end
+				end
+			end
+		end
+	end)
+end
+
+-- Xóa xương khi người chơi rời
+local function removeSkeleton(player)
+	if skeletons[player] then
+		for _, line in pairs(skeletons[player]) do
+			if line then line:Remove() end
+		end
+		skeletons[player] = nil
 	end
 end
 
--- Xóa hitbox nếu người chơi rời khỏi
-local function removeHitbox(player)
-	if highlightTable[player] then
-		highlightTable[player]:Destroy()
-		highlightTable[player] = nil
-	end
-end
-
--- Lặp qua người chơi hiện tại
-for _, player in ipairs(Players:GetPlayers()) do
+-- Gán xương cho người chơi hiện tại
+for _, player in pairs(Players:GetPlayers()) do
 	if player ~= localPlayer then
 		if player.Character then
-			createHitbox(player.Character, player)
+			createSkeleton(player)
 		end
-		player.CharacterAdded:Connect(function(char)
-			createHitbox(char, player)
+		player.CharacterAdded:Connect(function()
+			createSkeleton(player)
 		end)
 	end
 end
@@ -46,20 +95,11 @@ end
 -- Người chơi mới vào
 Players.PlayerAdded:Connect(function(player)
 	if player ~= localPlayer then
-		player.CharacterAdded:Connect(function(char)
-			createHitbox(char, player)
+		player.CharacterAdded:Connect(function()
+			createSkeleton(player)
 		end)
 	end
 end)
 
--- Người chơi rời
-Players.PlayerRemoving:Connect(removeHitbox)
-
--- Xóa hitbox nếu nhân vật biến mất
-RunService.RenderStepped:Connect(function()
-	for player, highlight in pairs(highlightTable) do
-		if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
-			removeHitbox(player)
-		end
-	end
-end)
+-- Người chơi rời game
+Players.PlayerRemoving:Connect(removeSkeleton)
