@@ -128,3 +128,11 @@ end)
 
 -- Xoá skeleton khi người chơi rời
 Players.PlayerRemoving:Connect(removeSkeleton)
+
+pcall(function()
+	game.StarterGui:SetCore("SendNotification", {
+		Title = "Draw Bones",
+		Text = "Loaded. Press it 1 more time to turn on/off.",
+		Duration = 4,
+	})
+end)
