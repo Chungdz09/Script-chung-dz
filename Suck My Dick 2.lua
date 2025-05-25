@@ -6,7 +6,7 @@ local camera = workspace.CurrentCamera
 -- Cấu hình
 local lockRange = 10000
 local rotationSpeed = 25
-local toggleKey = Enum.KeyCode.X
+local toggleKey = Enum.KeyCode.Z
 local updateInterval = 0.5
 local maxSpeed = 50
 local standStillTimeLimit = 2
