@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
 local camera = workspace.CurrentCamera
 
 -- Cấu hình
@@ -15,8 +16,8 @@ local minHeight = 5 -- Chiều cao tối thiểu của mục tiêu để dịch 
 
 -- Biến
 local localPlayer = Players.LocalPlayer
-local lockedPlayer = nil
-local lockEnabled = false
+local lockedPlayer = true
+local lockEnabled = true
 local lastUpdate = 0
 local previousTargetPosition = nil
 local standStillTimer = 0
@@ -157,8 +158,33 @@ RunService.RenderStepped:Connect(function(deltaTime)
 	if lockedPlayer then
 		teleportBehindTarget(lockedPlayer)
 		rotateCameraToTarget(lockedPlayer, deltaTime)
+
+		-- Always press "3" to switch to knife
+		VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Three, false, game)
+		VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Three, false, game)
 	end
 end)
+
+local function startClicking()
+    spawn(function()
+        while true do
+            if lockEnabled and lockedPlayer then
+                local mousePos = UserInputService:GetMouseLocation()
+                -- Press left mouse button down
+                VirtualInputManager:SendMouseButtonEvent(mousePos.X, mousePos.Y, 0, true, game, 0)
+                wait(0.01)  -- tiny delay to register click properly
+                -- Release left mouse button
+                VirtualInputManager:SendMouseButtonEvent(mousePos.X, mousePos.Y, 0, false, game, 0)
+                wait(0.1)  -- wait before next click; adjust for click speed
+            else
+                wait(0.1) -- wait a bit if not clicking
+            end
+        end
+    end)
+end
+
+-- Start clicking coroutine initially
+startClicking()
 
 -- Thông báo khi script nạp xong
 pcall(function()
