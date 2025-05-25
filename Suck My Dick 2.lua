@@ -156,7 +156,7 @@ end)
 pcall(function()
 	game.StarterGui:SetCore("SendNotification", {
 		Title = "Auto Lock-On & Teleport",
-		Text = "Loaded. Press X to toggle.",
+		Text = "Loaded. Press Z to toggle.",
 		Duration = 4,
 	})
 end)
