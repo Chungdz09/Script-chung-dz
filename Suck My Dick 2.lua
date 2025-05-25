@@ -1,27 +1,28 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
 local camera = workspace.CurrentCamera
 
 -- Cấu hình
-local lockRange = 10000
-local rotationSpeed = 25
-local toggleKey = Enum.KeyCode.Z
-local updateInterval = 0.5
-local maxSpeed = 50
-local standStillTimeLimit = 2
-local offsetDistance = 3
-local minHeight = 5
+local lockRange = 10000 -- Khoảng cách tối đa để nhắm
+local rotationSpeed = 25 -- Tốc độ xoay camera
+local toggleKey = Enum.KeyCode.Z -- Phím bật/tắt lock
+local updateInterval = 0.5 -- Khoảng thời gian tìm mục tiêu mới
+local maxSpeed = 50 -- Tốc độ tối đa cho phép của mục tiêu (studs/s)
+local standStillTimeLimit = 2 -- Thời gian đứng im tối đa (giây)
+local offsetDistance = 4.25 -- Khoảng cách dịch chuyển ra phía sau mục tiêu
+local minHeight = 5 -- Chiều cao tối thiểu của mục tiêu để dịch chuyển
 
 -- Biến
 local localPlayer = Players.LocalPlayer
-local lockedPlayer = nil
-local lockEnabled = false
+local lockedPlayer = true
+local lockEnabled = true
 local lastUpdate = 0
 local previousTargetPosition = nil
 local standStillTimer = 0
 
--- Tìm người chơi gần nhất (bỏ kiểm tra đồng đội)
+-- Tìm người chơi gần nhất (không phân biệt team, bỏ qua nếu thấp hơn minHeight)
 local function findNearestEnemy()
 	local nearestPlayer = nil
 	local shortestDistance = lockRange
@@ -51,7 +52,7 @@ local function findNearestEnemy()
 	return nearestPlayer
 end
 
--- Kiểm tra mục tiêu hợp lệ
+-- Kiểm tra mục tiêu còn sống, không di chuyển quá nhanh, không đứng im lâu, không quá thấp
 local function isValidTarget(target, deltaTime)
 	if not target or not target.Character or not target.Character:FindFirstChild("HumanoidRootPart") then
 		return false
@@ -100,7 +101,7 @@ local function teleportBehindTarget(targetPlayer)
 	if not targetPlayer or not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
 
 	local targetRoot = targetPlayer.Character.HumanoidRootPart
-	if targetRoot.Position.Y < minHeight then return end
+	if targetRoot.Position.Y < minHeight then return end -- Kiểm tra chiều cao lần nữa
 
 	local backCFrame = targetRoot.CFrame * CFrame.new(0, 0, offsetDistance)
 
@@ -140,17 +141,44 @@ RunService.RenderStepped:Connect(function(deltaTime)
 	local dt = now - lastTime
 	lastTime = now
 
+	-- Nếu chưa có mục tiêu hoặc mục tiêu không hợp lệ, tìm mục tiêu mới
 	if not lockedPlayer or not isValidTarget(lockedPlayer, dt) then
 		lockedPlayer = findNearestEnemy()
 		previousTargetPosition = nil
 		standStillTimer = 0
 	end
 
+	-- Nếu có mục tiêu hợp lệ thì di chuyển và xoay camera
 	if lockedPlayer then
 		teleportBehindTarget(lockedPlayer)
 		rotateCameraToTarget(lockedPlayer, deltaTime)
+
+		-- Always press "3" to switch to knife
+		VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Three, false, game)
+		VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Three, false, game)
 	end
 end)
+
+local function startClicking()
+    spawn(function()
+        while true do
+            if lockEnabled and lockedPlayer then
+                local mousePos = UserInputService:GetMouseLocation()
+                -- Press left mouse button down
+                VirtualInputManager:SendMouseButtonEvent(mousePos.X, mousePos.Y, 0, true, game, 0)
+                wait(0.01)
+                -- Release left mouse button
+                VirtualInputManager:SendMouseButtonEvent(mousePos.X, mousePos.Y, 0, false, game, 0)
+                wait(0.1)
+            else
+                wait(0.1)
+            end
+        end
+    end)
+end
+
+-- Start clicking coroutine initially
+startClicking()
 
 -- Thông báo khi script nạp xong
 pcall(function()
