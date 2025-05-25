@@ -8,12 +8,13 @@ local rotationSpeed = 1
 local fovAngle = 16
 local visualFovRadius = 100
 local toggleKey = Enum.KeyCode.F
+local maxTargetSpeed = 50
 
 local localPlayer = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 local lockedPlayer = nil
 local lockingOn = false
-local lockEnabled = true -- mặc định bật
+local lockEnabled = true
 
 local fovCircle = nil
 
@@ -48,10 +49,7 @@ local function findNearestPlayerInFOV()
 
     for _, player in ipairs(Players:GetPlayers()) do
         if player ~= localPlayer and player.Character and player.Character:FindFirstChild("Head") then
-            -- Loại trừ đồng đội
-            if player.Team == localPlayer.Team then
-                -- Bỏ qua đồng đội
-            else
+            if player.Team ~= localPlayer.Team then
                 local targetPos = player.Character.Head.Position
                 local distance = (targetPos - localPos).Magnitude
 
@@ -73,13 +71,23 @@ local function findNearestPlayerInFOV()
 end
 
 local function lockOn()
-    lockedPlayer = findNearestPlayerInFOV()
-    if lockedPlayer then
-        lockingOn = true
-        print("Locked on:", lockedPlayer.Name)
-    else
-        print("No target in range or FOV.")
+    local candidate = findNearestPlayerInFOV()
+    if candidate and candidate.Character and candidate.Character:FindFirstChild("HumanoidRootPart") then
+        local hrp = candidate.Character:FindFirstChild("HumanoidRootPart")
+        local speed = hrp.Velocity.Magnitude
+
+        if speed <= maxTargetSpeed then
+            local humanoid = candidate.Character:FindFirstChild("Humanoid")
+            if humanoid and humanoid.Health > 0 then
+                lockedPlayer = candidate
+                lockingOn = true
+                print("Locked on:", lockedPlayer.Name)
+                return
+            end
+        end
     end
+
+    print("No valid target to lock on.")
 end
 
 local function releaseLock()
@@ -98,7 +106,7 @@ local function toggleLock()
     end
 end
 
--- Khởi tạo FOV Circle lần đầu
+-- Init FOV Circle
 createFOVCircle()
 
 UserInputService.InputBegan:Connect(function(input, gp)
@@ -124,11 +132,42 @@ RunService:BindToRenderStep("LockOnSystem", Enum.RenderPriority.Camera.Value + 1
         fovCircle.Position = Vector2.new(mousePos.X, mousePos.Y)
     end
 
-    if lockEnabled and lockingOn and lockedPlayer and lockedPlayer.Character and lockedPlayer.Character:FindFirstChild("Head") then
-        local targetPos = lockedPlayer.Character.Head.Position
-        local direction = (targetPos - camera.CFrame.Position).Unit
-        local targetCFrame = CFrame.new(camera.CFrame.Position, camera.CFrame.Position + direction)
-        camera.CFrame = camera.CFrame:Lerp(targetCFrame, rotationSpeed)
+    if lockEnabled and lockingOn and lockedPlayer and lockedPlayer.Character then
+        local character = lockedPlayer.Character
+        local humanoid = character:FindFirstChild("Humanoid")
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        local head = character:FindFirstChild("Head")
+
+        if not humanoid or humanoid.Health <= 0 then
+            print("Target is dead. Releasing lock.")
+            releaseLock()
+            return
+        end
+
+        if hrp then
+            local speed = hrp.Velocity.Magnitude
+            if speed > maxTargetSpeed then
+                print("Target moving too fast. Releasing lock.")
+                releaseLock()
+                return
+            end
+        end
+
+        if head then
+            local targetPos = head.Position
+            local direction = (targetPos - camera.CFrame.Position).Unit
+            local camLook = camera.CFrame.LookVector
+            local angle = math.deg(math.acos(math.clamp(camLook:Dot(direction), -1, 1)))
+
+            if angle > fovAngle then
+                print("Target moved out of FOV. Releasing lock.")
+                releaseLock()
+                return
+            end
+
+            local targetCFrame = CFrame.new(camera.CFrame.Position, camera.CFrame.Position + direction)
+            camera.CFrame = camera.CFrame:Lerp(targetCFrame, rotationSpeed)
+        end
     end
 end)
 
