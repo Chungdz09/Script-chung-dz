@@ -10,7 +10,7 @@ local toggleKey = Enum.KeyCode.X -- Phím bật/tắt lock
 local updateInterval = 0.5 -- Khoảng thời gian tìm mục tiêu mới
 local maxSpeed = 50 -- Tốc độ tối đa cho phép của mục tiêu (studs/s)
 local standStillTimeLimit = 2 -- Thời gian đứng im tối đa (giây)
-local offsetDistance = 2.2 -- Khoảng cách dịch chuyển ra phía sau mục tiêu
+local offsetDistance = 3 -- Khoảng cách dịch chuyển ra phía sau mục tiêu
 local minHeight = 5 -- Chiều cao tối thiểu của mục tiêu để dịch chuyển
 
 -- Biến
