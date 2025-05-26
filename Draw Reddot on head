@@ -1,18 +1,18 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local Teams = game:GetService("Teams")
 local localPlayer = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
--- Biến toggle
-_G.dotESPEnabled = not _G.dotESPEnabled -- bật/tắt mỗi lần chạy
+-- Toggle
+_G.dotESPEnabled = not _G.dotESPEnabled
 local enabled = _G.dotESPEnabled
 
--- Biến lưu dấu chấm và kết nối
+-- Cleanup if disabled
 _G.dotESPConnections = _G.dotESPConnections or {}
 _G.dotESPObjects = _G.dotESPObjects or {}
 
 if not enabled then
-	-- Nếu tắt -> xóa toàn bộ dấu chấm và ngưng kết nối
 	for _, dot in pairs(_G.dotESPObjects) do
 		dot:Remove()
 	end
@@ -25,9 +25,10 @@ if not enabled then
 	return
 end
 
--- Tạo dấu chấm
+-- Create red dot for enemy
 local function createDot(player)
 	if player == localPlayer then return end
+	if player.Team == localPlayer.Team then return end -- ❌ Bỏ qua đồng đội
 
 	local dot = Drawing.new("Circle")
 	dot.Radius = 5
@@ -39,7 +40,7 @@ local function createDot(player)
 	_G.dotESPObjects[player] = dot
 end
 
--- Xoá dấu chấm khi người chơi rời
+-- Remove red dot when player leaves
 local function removeDot(player)
 	if _G.dotESPObjects[player] then
 		_G.dotESPObjects[player]:Remove()
@@ -47,22 +48,26 @@ local function removeDot(player)
 	end
 end
 
--- Tạo dấu chấm cho tất cả người chơi hiện tại
+-- Initial creation for existing players
 for _, player in pairs(Players:GetPlayers()) do
 	createDot(player)
 end
 
--- Kết nối sự kiện thêm người chơi
+-- Player join/leave
 table.insert(_G.dotESPConnections, Players.PlayerAdded:Connect(function(player)
 	createDot(player)
 end))
 
--- Kết nối sự kiện xoá người chơi
 table.insert(_G.dotESPConnections, Players.PlayerRemoving:Connect(removeDot))
 
--- Cập nhật vị trí mỗi frame
+-- Update dot every frame
 table.insert(_G.dotESPConnections, RunService.RenderStepped:Connect(function()
 	for player, dot in pairs(_G.dotESPObjects) do
+		if player.Team == localPlayer.Team then
+			dot.Visible = false
+			continue -- ❌ Bỏ qua đồng đội khi cập nhật
+		end
+
 		local character = player.Character
 		if character and character:FindFirstChild("Head") then
 			local headPos = character.Head.Position
@@ -79,6 +84,7 @@ table.insert(_G.dotESPConnections, RunService.RenderStepped:Connect(function()
 	end
 end))
 
+-- Notification
 pcall(function()
 	game.StarterGui:SetCore("SendNotification", {
 		Title = "Draw Reddot on head",
