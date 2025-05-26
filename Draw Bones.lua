@@ -50,9 +50,10 @@ if not enabled then
 	return
 end
 
--- Tạo skeleton cho player
+-- Tạo skeleton cho player (bỏ qua đồng đội)
 local function createSkeleton(player)
 	if player == localPlayer then return end
+	if player.Team == localPlayer.Team then return end -- ❌ Bỏ qua đồng đội
 	_G.skeletons[player] = _G.skeletons[player] or {}
 end
 
@@ -69,6 +70,13 @@ end
 -- Update vị trí skeleton mỗi frame
 _G.skeletonESPConnection = RunService.RenderStepped:Connect(function()
 	for player, lines in pairs(_G.skeletons) do
+		if player.Team == localPlayer.Team then
+			for _, line in pairs(lines) do
+				line.Visible = false
+			end
+			continue -- ❌ Bỏ qua nếu là đồng đội (phòng trường hợp chuyển team)
+		end
+
 		local character = player.Character
 		if not character or not character:FindFirstChild("Head") then
 			for _, line in pairs(lines) do
@@ -114,7 +122,7 @@ end)
 
 -- Khởi tạo skeleton cho tất cả người chơi hiện tại
 for _, player in pairs(Players:GetPlayers()) do
-	if player ~= localPlayer then
+	if player ~= localPlayer and player.Team ~= localPlayer.Team then
 		createSkeleton(player)
 	end
 end
@@ -122,7 +130,11 @@ end
 -- Thêm skeleton khi người chơi mới vào
 Players.PlayerAdded:Connect(function(player)
 	if player ~= localPlayer then
-		createSkeleton(player)
+		player.CharacterAdded:Connect(function()
+			if player.Team ~= localPlayer.Team then
+				createSkeleton(player)
+			end
+		end)
 	end
 end)
 
