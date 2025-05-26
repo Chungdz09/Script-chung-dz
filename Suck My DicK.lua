@@ -6,12 +6,12 @@ local camera = workspace.CurrentCamera
 
 -- Cấu hình
 local lockRange = 10000 -- Khoảng cách tối đa để nhắm
-local rotationSpeed = 25 -- Tốc độ xoay camera
+local rotationSpeed = 15 -- Tốc độ xoay camera
 local toggleKey = Enum.KeyCode.X -- Phím bật/tắt lock
-local updateInterval = 0.5 -- Khoảng thời gian tìm mục tiêu mới
+local updateInterval = 0.1 -- Khoảng thời gian tìm mục tiêu mới
 local maxSpeed = 50 -- Tốc độ tối đa cho phép của mục tiêu (studs/s)
 local standStillTimeLimit = 2 -- Thời gian đứng im tối đa (giây)
-local offsetDistance = 4.25 -- Khoảng cách dịch chuyển ra phía sau mục tiêu
+local offsetDistance = 4.5 -- Khoảng cách dịch chuyển ra phía sau mục tiêu
 local minHeight = 5 -- Chiều cao tối thiểu của mục tiêu để dịch chuyển
 
 -- Biến
