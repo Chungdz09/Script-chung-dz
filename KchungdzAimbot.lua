@@ -3,93 +3,151 @@ local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 -- Configuration
-local lockRange = 50 -- Maximum distance to lock onto a player
-local rotationSpeed = 1 -- Speed at which the turret rotates
-local toggleKey = Enum.KeyCode.X -- Key to toggle lock-on
+local lockRange = 10000
+local screenRadius = 100
+local rotationSpeed = 1
 
--- Variables
 local localPlayer = Players.LocalPlayer
 local camera = workspace.CurrentCamera
+
 local lockedPlayer = nil
 local lockingOn = false
-local lockEnabled = true -- Toggle state
+local uiVisible = true
 
--- Function to find the nearest player within the lock range
-local function findNearestPlayer()
-    local nearestPlayer = nil
-    local shortestDistance = lockRange
+-- GUI Setup
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TargetLockUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = localPlayer:WaitForChild("PlayerGui")
 
-    if not localPlayer.Character or not localPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        return nil
-    end
+local infoLabel = Instance.new("TextLabel")
+infoLabel.Size = UDim2.new(0, 200, 0, 40)
+infoLabel.Position = UDim2.new(0, 10, 0, 10)
+infoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+infoLabel.BorderSizePixel = 0
+infoLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+infoLabel.TextScaled = true
+infoLabel.Font = Enum.Font.SourceSansBold
+infoLabel.Text = "Target: None"
+infoLabel.Visible = true
+infoLabel.Parent = screenGui
 
-    local localPosition = localPlayer.Character.HumanoidRootPart.Position
+-- Drag Variables
+local dragging = false
+local dragStart, startPos
 
-    for _, player in ipairs(Players:GetPlayers()) do
-        if player ~= localPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            local distance = (player.Character.HumanoidRootPart.Position - localPosition).Magnitude
-            if distance < shortestDistance then
-                shortestDistance = distance
-                nearestPlayer = player
-            end
-        end
-    end
+infoLabel.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = infoLabel.Position
+	end
+end)
 
-    return nearestPlayer
+infoLabel.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = input.Position - dragStart
+		infoLabel.Position = startPos + UDim2.new(0, delta.X, 0, delta.Y)
+	end
+end)
+
+-- Helpers
+local function updateUI()
+	if lockedPlayer and lockedPlayer.Character then
+		infoLabel.Text = "Target: " .. lockedPlayer.Name
+	else
+		infoLabel.Text = "Target: None"
+	end
 end
 
--- Function to lock onto a player
-local function lockOn()
-    lockedPlayer = findNearestPlayer()
-    if lockedPlayer then
-        lockingOn = true
-    end
+local function isInMouseCircle(worldPosition)
+	local screenPoint, onScreen = camera:WorldToViewportPoint(worldPosition)
+	if not onScreen then return false end
+
+	local mouseLocation = UserInputService:GetMouseLocation()
+	local distance = (Vector2.new(screenPoint.X, screenPoint.Y) - mouseLocation).Magnitude
+
+	return distance <= screenRadius
 end
 
--- Function to release the lock
-local function releaseLock()
-    lockedPlayer = nil
-    lockingOn = false
+-- ✅ Đã sửa: không còn ưu tiên gần nhất, chỉ chọn người đầu tiên trong vòng chuột
+local function findPlayerUnderMouse()
+	if not localPlayer.Character or not localPlayer.Character:FindFirstChild("HumanoidRootPart") then
+		return nil
+	end
+
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= localPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+			local rootPart = player.Character.HumanoidRootPart
+			local distance = (rootPart.Position - localPlayer.Character.HumanoidRootPart.Position).Magnitude
+
+			if distance <= lockRange and isInMouseCircle(rootPart.Position) then
+				return player -- chỉ cần thấy là chọn
+			end
+		end
+	end
+
+	return nil
 end
 
--- Toggle lock-on state
-local function toggleLock()
-    lockEnabled = not lockEnabled
-    if not lockEnabled then
-        releaseLock()
-    end
-    print("Lock-On Enabled:", lockEnabled)
+local function toggleLockUnderMouse()
+	if lockedPlayer then
+		print("Released lock on", lockedPlayer.Name)
+		lockedPlayer = nil
+		lockingOn = false
+	else
+		local target = findPlayerUnderMouse()
+		if target then
+			lockedPlayer = target
+			print("Locked onto", target.Name)
+		else
+			print("No player under mouse circle")
+		end
+	end
+	updateUI()
 end
 
--- Input detection
+-- Input Events
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if not gameProcessed then
-        if input.UserInputType == Enum.UserInputType.MouseButton2 and lockEnabled then
-            lockOn()
-        elseif input.KeyCode == toggleKey then
-            toggleLock()
-        end
-    end
+	if not gameProcessed then
+		if input.KeyCode == Enum.KeyCode.LeftControl then
+			toggleLockUnderMouse()
+		elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
+			if lockedPlayer then
+				lockingOn = true
+			end
+		elseif input.KeyCode == Enum.KeyCode.F1 then
+			uiVisible = not uiVisible
+			infoLabel.Visible = uiVisible
+		end
+	end
 end)
 
-UserInputService.InputEnded:Connect(function(input, gameProcessed)
-    if input.UserInputType == Enum.UserInputType.MouseButton2 then
-        releaseLock()
-    end
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton2 then
+		lockingOn = false
+	end
 end)
 
--- Update loop
+-- Lock-on camera movement
 RunService.RenderStepped:Connect(function()
-    if lockEnabled and lockingOn and lockedPlayer and lockedPlayer.Character and lockedPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        local targetPosition = lockedPlayer.Character.HumanoidRootPart.Position
-        local direction = (targetPosition - camera.CFrame.Position).Unit
-        local targetCFrame = CFrame.new(camera.CFrame.Position, camera.CFrame.Position + direction)
-        camera.CFrame = camera.CFrame:Lerp(targetCFrame, rotationSpeed)
-    end
+	if lockingOn and lockedPlayer and lockedPlayer.Character and lockedPlayer.Character:FindFirstChild("HumanoidRootPart") then
+		local targetPosition = lockedPlayer.Character.HumanoidRootPart.Position
+		local direction = (targetPosition - camera.CFrame.Position).Unit
+		local targetCFrame = CFrame.new(camera.CFrame.Position, camera.CFrame.Position + direction)
+		camera.CFrame = camera.CFrame:Lerp(targetCFrame, rotationSpeed)
+	end
 end)
 
+-- Notify on load
 game.StarterGui:SetCore("SendNotification", {
-	Title = "Working.",
-	Text = "Success, Script Loaded.",
+	Title = "Target Lock",
+	Text = "Script loaded. Ctrl = lock, F1 = toggle UI",
 	Duration = 4,
 })
