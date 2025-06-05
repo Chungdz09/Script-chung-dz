@@ -53,7 +53,7 @@ local LocalPlayer = Players.LocalPlayer
 -- Danh sách UserId bị cấm
 local blacklist = {
     [8533167956] = true,
-    [987654321] = true
+    [3396922097] = true
 }
 
 -- Kiểm tra và đá người chơi nếu nằm trong danh sách
