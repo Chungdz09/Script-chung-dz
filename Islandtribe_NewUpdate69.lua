@@ -224,6 +224,70 @@ local Toggle = MainTab:CreateToggle({
    end,
 })
 
+-- Biến toàn cục để bật/tắt auto pickup
+local autoPickupEnabled = false
+
+-- Hàm bật/tắt được gọi từ toggle GUI
+local function ToggleAutoPickup(value)
+    autoPickupEnabled = value
+end
+
+-- Tạo toggle GUI (giả sử bạn có biến MainTab, thay thế theo thư viện bạn dùng)
+MainTab:CreateToggle({
+    Name = "Auto Pickup",
+    CurrentValue = false,
+    Flag = "AutoPickupToggle",
+    Callback = function(value)
+        ToggleAutoPickup(value)
+    end,
+})
+
+-- Các dịch vụ cần thiết
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local itemEvent = ReplicatedStorage:WaitForChild("References"):WaitForChild("Comm"):WaitForChild("Events"):WaitForChild("ItemInteracted")
+local pickupRadius = 18.5
+
+-- Lấy vị trí nhân vật
+local function getCharacterRoot()
+    local character = player.Character or player.CharacterAdded:Wait()
+    return character:WaitForChild("HumanoidRootPart")
+end
+
+-- Lấy vị trí gần đúng của model (dùng part đầu tiên tìm thấy)
+local function getModelPosition(model)
+    for _, part in pairs(model:GetDescendants()) do
+        if part:IsA("BasePart") then
+            return part.Position
+        end
+    end
+    return nil
+end
+
+-- Hàm tự động nhặt đồ
+local function autoPickup()
+    local rootPart = getCharacterRoot()
+    for _, itemModel in ipairs(workspace:GetDescendants()) do
+        if itemModel:IsA("Model") and itemModel:FindFirstChildWhichIsA("BasePart") then
+            local pos = getModelPosition(itemModel)
+            if pos and (pos - rootPart.Position).Magnitude <= pickupRadius then
+                itemEvent:FireServer(itemModel, "Pickup")
+            end
+        end
+    end
+end
+
+-- Vòng lặp chạy nền kiểm tra toggle và tự nhặt đồ
+task.spawn(function()
+    while true do
+        if autoPickupEnabled then
+            pcall(autoPickup)  -- pcall để tránh lỗi dừng script
+        end
+        task.wait(0.5) -- chờ 1 giây trước khi quét lại
+    end
+end)
 local MainSection = MainTab:CreateSection("Sliders")
 
 local Slider = MainTab:CreateSlider({
