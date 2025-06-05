@@ -1,26 +1,3 @@
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-
--- Danh sách UserId bị cấm
-local blacklist = {
-    [8533167956] = true,
-    [8606246620] = true
-}
-
--- Kiểm tra và đá người chơi nếu nằm trong danh sách
-if blacklist[LocalPlayer.UserId] then
-    game.StarterGui:SetCore("SendNotification", {
-        Title = "🚫 Cảnh báo",
-        Text = "You have been blacklisted by the script owner.",
-        Duration = 10
-    })
-
-    task.wait(5)
-
-    LocalPlayer:Kick("You have been blacklisted by the script owner.")
-    return -- Đảm bảo không chạy các dòng sau
-end
-
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
     Name = "                                Island Tribes 🌴",
@@ -968,3 +945,26 @@ local Button = Tab5:CreateButton({
         Event:FireServer(chestID, action)
     end
 })
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Danh sách UserId bị cấm
+local blacklist = {
+    [8533167956] = true,
+    [8606246620] = true
+}
+
+-- Kiểm tra và đá người chơi nếu nằm trong danh sách
+if blacklist[LocalPlayer.UserId] then
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "🚫 Cảnh báo",
+        Text = "You have been blacklisted by the script owner.",
+        Duration = 10
+    })
+
+    task.wait(5)
+
+    LocalPlayer:Kick("You have been blacklisted by the script owner.")
+    return -- Đảm bảo không chạy các dòng sau
+end
