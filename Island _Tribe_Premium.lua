@@ -1,3 +1,20 @@
+local blacklist = {
+    [8533167956] = true,
+    [987654321] = true
+}
+
+if blacklist[LocalPlayer.UserId] then
+    -- Hiện thông báo cảnh báo
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "WARN",
+        Text = "You have been banned.",
+        Duration = 10
+    })
+
+    wait(5)
+    LocalPlayer:Kick("You have been blacklisted by the script owner.
+ ")
+
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
     Name = "                                Island Tribes 🌴",
