@@ -114,7 +114,7 @@ local Toggle = MainTab:CreateToggle({
    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Infinite%20Jump.txt"))()
    end,
 })
- 
+
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ToolActionEvent = ReplicatedStorage:WaitForChild("References"):WaitForChild("Comm"):WaitForChild("Events"):WaitForChild("ToolAction")
@@ -133,25 +133,35 @@ local function ToggleAutoMine(state)
             local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
             local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
             while AutoMine do
-                local mineFolder = workspace:WaitForChild("Replicators"):WaitForChild("Both")
-                for _, mineObject in pairs(mineFolder:GetChildren()) do
-                    if mineObject:IsA("BasePart") then
-                        local dist = (mineObject.Position - HumanoidRootPart.Position).Magnitude
-                        if dist < RANGE then
-                            ToolActionEvent:FireServer(mineObject)
-                        end
-                    elseif mineObject:IsA("Model") and not mineObject:FindFirstChildWhichIsA("Humanoid") then
-                        for _, child in pairs(mineObject:GetDescendants()) do
-                            if child:IsA("BasePart") then
-                                local dist = (child.Position - HumanoidRootPart.Position).Magnitude
-                                if dist < RANGE then
-                                    ToolActionEvent:FireServer(mineObject)
-                                    break
+                -- Tự động đánh Volcanic Rock
+                local volcanicRock = workspace:FindFirstChild("Volcanic Rock")
+                if volcanicRock then
+                    ToolActionEvent:FireServer(volcanicRock)
+                end
+
+                -- Quét xung quanh và tự đào mỏ trong phạm vi
+                local mineFolder = workspace:FindFirstChild("Replicators") and workspace.Replicators:FindFirstChild("Both")
+                if mineFolder then
+                    for _, mineObject in pairs(mineFolder:GetChildren()) do
+                        if mineObject:IsA("BasePart") then
+                            local dist = (mineObject.Position - HumanoidRootPart.Position).Magnitude
+                            if dist < RANGE then
+                                ToolActionEvent:FireServer(mineObject)
+                            end
+                        elseif mineObject:IsA("Model") and not mineObject:FindFirstChildWhichIsA("Humanoid") then
+                            for _, child in pairs(mineObject:GetDescendants()) do
+                                if child:IsA("BasePart") then
+                                    local dist = (child.Position - HumanoidRootPart.Position).Magnitude
+                                    if dist < RANGE then
+                                        ToolActionEvent:FireServer(mineObject)
+                                        break
+                                    end
                                 end
                             end
                         end
                     end
                 end
+
                 task.wait(0.5)
             end
             AutoMineThread = nil
@@ -159,7 +169,7 @@ local function ToggleAutoMine(state)
     end
 end
 
--- Giả sử bạn có UI tab MainTab rồi, tạo toggle thế này:
+-- Tạo nút bật/tắt
 MainTab:CreateToggle({
     Name = "Mine Aura",
     CurrentValue = false,
@@ -168,6 +178,7 @@ MainTab:CreateToggle({
         ToggleAutoMine(value)
     end,
 })
+
 
 local AutoAttackPlayer = false
 local AutoAttackMod = false
@@ -247,6 +258,71 @@ MainTab:CreateToggle({
         end
     end,
 })
+
+-- Biến toàn cục để bật/tắt auto pickup
+local autoPickupEnabled = false
+
+-- Hàm bật/tắt được gọi từ toggle GUI
+local function ToggleAutoPickup(value)
+    autoPickupEnabled = value
+end
+
+-- Tạo toggle GUI (giả sử bạn có biến MainTab, thay thế theo thư viện bạn dùng)
+MainTab:CreateToggle({
+    Name = "Auto Pickup",
+    CurrentValue = false,
+    Flag = "AutoPickupToggle",
+    Callback = function(value)
+        ToggleAutoPickup(value)
+    end,
+})
+
+-- Các dịch vụ cần thiết
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local itemEvent = ReplicatedStorage:WaitForChild("References"):WaitForChild("Comm"):WaitForChild("Events"):WaitForChild("ItemInteracted")
+local pickupRadius = 18.5
+
+-- Lấy vị trí nhân vật
+local function getCharacterRoot()
+    local character = player.Character or player.CharacterAdded:Wait()
+    return character:WaitForChild("HumanoidRootPart")
+end
+
+-- Lấy vị trí gần đúng của model (dùng part đầu tiên tìm thấy)
+local function getModelPosition(model)
+    for _, part in pairs(model:GetDescendants()) do
+        if part:IsA("BasePart") then
+            return part.Position
+        end
+    end
+    return nil
+end
+
+-- Hàm tự động nhặt đồ
+local function autoPickup()
+    local rootPart = getCharacterRoot()
+    for _, itemModel in ipairs(workspace:GetDescendants()) do
+        if itemModel:IsA("Model") and itemModel:FindFirstChildWhichIsA("BasePart") then
+            local pos = getModelPosition(itemModel)
+            if pos and (pos - rootPart.Position).Magnitude <= pickupRadius then
+                itemEvent:FireServer(itemModel, "Pickup")
+            end
+        end
+    end
+end
+
+-- Vòng lặp chạy nền kiểm tra toggle và tự nhặt đồ
+task.spawn(function()
+    while true do
+        if autoPickupEnabled then
+            pcall(autoPickup)  -- pcall để tránh lỗi dừng script
+        end
+        task.wait(0.5) -- chờ 1 giây trước khi quét lại
+    end
+end)
 
 local MainSection = MainTab:CreateSection("Sliders")
 
@@ -383,6 +459,79 @@ local Button = Tab2:CreateToggle({
         else
             if LuckySlimeLoop then
                 task.cancel(LuckySlimeLoop)
+            end
+        end
+    end,
+})
+
+-- Biến điều khiển
+local AutoAttackZenyteGolem = false
+local ZenyteGolemLoop
+local HoverForce -- để lưu BodyVelocity khi bay
+
+-- Dịch vụ
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local ToolActionEvent = ReplicatedStorage:WaitForChild("References"):WaitForChild("Comm"):WaitForChild("Events"):WaitForChild("ToolAction")
+
+-- Toggle GUI
+local Button = Tab2:CreateToggle({
+    Name = "Auto Attack Zenyte Golem",
+    CurrentValue = false,
+    Flag = "AutoAttackZenyteGolem",
+    Callback = function(Value)
+        AutoAttackZenyteGolem = Value
+
+        local Character = LocalPlayer.Character
+        local MyRoot = Character and Character:FindFirstChild("HumanoidRootPart")
+
+        if AutoAttackZenyteGolem then
+            ZenyteGolemLoop = task.spawn(function()
+                while AutoAttackZenyteGolem do
+                    local Golem = workspace:FindFirstChild("Replicators")
+                        and workspace.Replicators:FindFirstChild("NonPassive")
+                        and workspace.Replicators.NonPassive:FindFirstChild("Zenyte Golem")
+
+                    Character = LocalPlayer.Character
+                    MyRoot = Character and Character:FindFirstChild("HumanoidRootPart")
+
+                    if Golem and Golem:FindFirstChild("Humanoid") and Golem:FindFirstChild("HumanoidRootPart")
+                        and Golem.Humanoid.Health > 0 and MyRoot then
+
+                        -- Tạo BodyVelocity để giữ nhân vật bay
+                        if not HoverForce then
+                            HoverForce = Instance.new("BodyVelocity")
+                            HoverForce.Velocity = Vector3.new(0, 0, 0)
+                            HoverForce.MaxForce = Vector3.new(0, 1e5, 0)
+                            HoverForce.Name = "AntiGravity"
+                            HoverForce.Parent = MyRoot
+                        end
+
+                        -- Bay lên đầu Golem
+                        local targetPos = Golem.HumanoidRootPart.Position + Vector3.new(0, 15, 0)
+                        local targetCFrame = CFrame.new(targetPos)
+
+                        TweenService:Create(MyRoot, TweenInfo.new(0.1, Enum.EasingStyle.Linear), {
+                            CFrame = targetCFrame
+                        }):Play()
+
+                        -- Tấn công
+                        ToolActionEvent:FireServer(Golem)
+                    end
+
+                    task.wait(0.5)
+                end
+            end)
+        else
+            if ZenyteGolemLoop then
+                task.cancel(ZenyteGolemLoop)
+            end
+            -- Gỡ BodyVelocity để ngưng bay
+            if HoverForce then
+                HoverForce:Destroy()
+                HoverForce = nil
             end
         end
     end,
