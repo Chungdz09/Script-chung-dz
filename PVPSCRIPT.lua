@@ -353,6 +353,7 @@ local Slider = MainTab:CreateSlider({
 local Tab2 = Window:CreateTab("Farming", nil)
 local Section = Tab2:CreateSection("Auto Farm") 
 
+-- Biến điều khiển
 local AutoAttackMushroomSpirit = false
 local MushroomSpiritLoop
 
@@ -385,7 +386,7 @@ local Button = Tab2:CreateToggle({
                         and Spirit:FindFirstChild("HumanoidRootPart")
                         and Spirit.Humanoid.Health > 0 and MyRoot then
 
-                        -- Bay lên đầu Mushroom Spirit (cao 25 studs)
+                        -- Bay lên đầu Mushroom Spirit
                         local targetPos = Spirit.HumanoidRootPart.Position + Vector3.new(0, 12, 0)
                         local targetCFrame = CFrame.new(targetPos)
 
@@ -393,7 +394,7 @@ local Button = Tab2:CreateToggle({
                             CFrame = targetCFrame
                         }):Play()
 
-                        -- Gửi lệnh tấn công
+                        -- Tấn công
                         ToolActionEvent:FireServer(Spirit)
                     end
 
@@ -403,6 +404,7 @@ local Button = Tab2:CreateToggle({
         else
             if MushroomSpiritLoop then
                 task.cancel(MushroomSpiritLoop)
+                MushroomSpiritLoop = nil
             end
         end
     end,
@@ -440,16 +442,15 @@ local Button = Tab2:CreateToggle({
                     if Slime and Slime:FindFirstChild("Humanoid") and Slime:FindFirstChild("HumanoidRootPart")
                         and Slime.Humanoid.Health > 0 and MyRoot then
 
-                        -- Tính vị trí bay lên trên đầu Slime
+                        -- Bay lên đầu Slime
                         local targetPos = Slime.HumanoidRootPart.Position + Vector3.new(0, 15, 0)
                         local targetCFrame = CFrame.new(targetPos)
 
-                        -- Di chuyển đến vị trí trên đầu Slime
                         TweenService:Create(MyRoot, TweenInfo.new(0.01, Enum.EasingStyle.Linear), {
                             CFrame = targetCFrame
                         }):Play()
 
-                        -- Gửi lệnh tấn công
+                        -- Tấn công
                         ToolActionEvent:FireServer(Slime)
                     end
 
@@ -459,6 +460,7 @@ local Button = Tab2:CreateToggle({
         else
             if LuckySlimeLoop then
                 task.cancel(LuckySlimeLoop)
+                LuckySlimeLoop = nil
             end
         end
     end,
