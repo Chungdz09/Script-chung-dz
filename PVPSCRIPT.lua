@@ -115,6 +115,119 @@ local Toggle = MainTab:CreateToggle({
    end,
 })
 
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Window = Rayfield:CreateWindow({
+    Name = "                                Island Tribes 🌴",
+    LoadingTitle = "WSP",
+    LoadingSubtitle = "Made by Chungdz credit to Friend",
+    ConfigurationSaving = {
+       Enabled = flase,
+       FolderName = nil, 
+       FileName = "Nigga 69"
+    },
+
+    KeySystem = true,
+    KeySettings = {
+       Title = "Island Tribes 🌴",
+       Subtitle = "Made by Chung credit #Chungdz",
+       Note = "this guy is gay gbaox_01",
+       FileName = "0", 
+       SaveKey = true,
+       GrabKeyFromSite = true,
+       Key = {"https://raw.githubusercontent.com/Chungdz09/Script-chung-dz/refs/heads/main/Key"}
+    }
+ })
+
+ local MainTab = Window:CreateTab("🏠 Main", nil) 
+ local MainSection = MainTab:CreateSection("Other Scripts")
+ 
+local AutoAttackPlayer = false
+local AttackPlayerLoop
+local TargetPlayerName = ""
+local HoverForce
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ToolActionEvent = ReplicatedStorage:WaitForChild("References"):WaitForChild("Comm"):WaitForChild("Events"):WaitForChild("ToolAction")
+local LocalPlayer = Players.LocalPlayer
+
+-- Input nhập tên người chơi mục tiêu
+MainTab:CreateInput({
+    Name = "Target Player Name",
+    CurrentValue = "",
+    PlaceholderText = "Input Player Name",
+    RemoveTextAfterFocusLost = false,
+    Flag = "TargetPlayerNameInput",
+    Callback = function(Text)
+        TargetPlayerName = Text
+    end,
+})
+
+-- Toggle bật/tắt Kill Aura + bay bằng BodyVelocity
+MainTab:CreateToggle({
+    Name = "Auto Kill Player Target",
+    CurrentValue = false,
+    Flag = "AutoAttackPlayer",
+    Callback = function(Value)
+        AutoAttackPlayer = Value
+
+        if AutoAttackPlayer then
+            if AttackPlayerLoop then return end
+
+            AttackPlayerLoop = task.spawn(function()
+                while AutoAttackPlayer do
+                    local Character = LocalPlayer.Character
+                    local MyRoot = Character and Character:FindFirstChild("HumanoidRootPart")
+
+                    if MyRoot and TargetPlayerName ~= "" then
+                        local targetPlayer = Players:FindFirstChild(TargetPlayerName)
+
+                        if targetPlayer and targetPlayer ~= LocalPlayer then
+                            local TargetChar = targetPlayer.Character
+                            local TargetHRP = TargetChar and TargetChar:FindFirstChild("HumanoidRootPart")
+                            local Humanoid = TargetChar and TargetChar:FindFirstChild("Humanoid")
+
+                            if TargetHRP and Humanoid and Humanoid.Health > 0 then
+                                -- Gắn BodyVelocity để bay
+                                if not HoverForce then
+                                    HoverForce = Instance.new("BodyVelocity")
+                                    HoverForce.Name = "AntiGravity"
+                                    HoverForce.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+                                    HoverForce.Velocity = Vector3.zero
+                                    HoverForce.Parent = MyRoot
+                                end
+
+                                -- Tính vị trí bay phía trên đầu mục tiêu
+                                local targetPos = TargetHRP.Position + Vector3.new(0, 15, 0)
+                                local direction = (targetPos - MyRoot.Position) * 5
+                                HoverForce.Velocity = direction
+
+                                -- Tấn công
+                                ToolActionEvent:FireServer(TargetChar)
+                            end
+                        end
+                    end
+
+                    task.wait(0.3)
+                end
+
+                AttackPlayerLoop = nil
+            end)
+        else
+            -- Tắt vòng lặp và gỡ BodyVelocity để ngưng bay
+            if AttackPlayerLoop then
+                task.cancel(AttackPlayerLoop)
+                AttackPlayerLoop = nil
+            end
+
+            if HoverForce then
+                HoverForce:Destroy()
+                HoverForce = nil
+            end
+        end
+    end,
+})
+
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ToolActionEvent = ReplicatedStorage:WaitForChild("References"):WaitForChild("Comm"):WaitForChild("Events"):WaitForChild("ToolAction")
