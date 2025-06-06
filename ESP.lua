@@ -135,3 +135,11 @@ end
 
 -- Kích hoạt ESP
 PlayerEsp()
+
+pcall(function()
+	game.StarterGui:SetCore("SendNotification", {
+		Title = "Draw Player",
+		Text = "Loaded. Press it 1 more time to turn on/off.",
+		Duration = 4,
+	})
+end)
