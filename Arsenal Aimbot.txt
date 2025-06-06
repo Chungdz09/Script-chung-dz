@@ -132,41 +132,69 @@ RunService:BindToRenderStep("LockOnSystem", Enum.RenderPriority.Camera.Value + 1
         fovCircle.Position = Vector2.new(mousePos.X, mousePos.Y)
     end
 
-    if lockEnabled and lockingOn and lockedPlayer and lockedPlayer.Character then
-        local character = lockedPlayer.Character
-        local humanoid = character:FindFirstChild("Humanoid")
-        local hrp = character:FindFirstChild("HumanoidRootPart")
-        local head = character:FindFirstChild("Head")
+    if lockEnabled then
+        if lockingOn and lockedPlayer and lockedPlayer.Character then
+            local character = lockedPlayer.Character
+            local humanoid = character:FindFirstChild("Humanoid")
+            local hrp = character:FindFirstChild("HumanoidRootPart")
+            local head = character:FindFirstChild("Head")
 
-        if not humanoid or humanoid.Health <= 0 then
-            print("Target is dead. Releasing lock.")
-            releaseLock()
-            return
-        end
+            local invalidTarget = false
 
-        if hrp then
-            local speed = hrp.Velocity.Magnitude
-            if speed > maxTargetSpeed then
-                print("Target moving too fast. Releasing lock.")
-                releaseLock()
-                return
-            end
-        end
-
-        if head then
-            local targetPos = head.Position
-            local direction = (targetPos - camera.CFrame.Position).Unit
-            local camLook = camera.CFrame.LookVector
-            local angle = math.deg(math.acos(math.clamp(camLook:Dot(direction), -1, 1)))
-
-            if angle > fovAngle then
-                print("Target moved out of FOV. Releasing lock.")
-                releaseLock()
-                return
+            if not humanoid or humanoid.Health <= 0 then
+                print("Target is dead. Releasing lock.")
+                invalidTarget = true
             end
 
-            local targetCFrame = CFrame.new(camera.CFrame.Position, camera.CFrame.Position + direction)
-            camera.CFrame = camera.CFrame:Lerp(targetCFrame, rotationSpeed)
+            if hrp then
+                local speed = hrp.Velocity.Magnitude
+                if speed > maxTargetSpeed then
+                    print("Target moving too fast. Releasing lock.")
+                    invalidTarget = true
+                end
+            else
+                invalidTarget = true
+            end
+
+            if head then
+                local targetPos = head.Position
+                local direction = (targetPos - camera.CFrame.Position).Unit
+                local camLook = camera.CFrame.LookVector
+                local angle = math.deg(math.acos(math.clamp(camLook:Dot(direction), -1, 1)))
+
+                if angle > fovAngle then
+                    print("Target moved out of FOV. Releasing lock.")
+                    invalidTarget = true
+                end
+            else
+                invalidTarget = true
+            end
+
+            if invalidTarget then
+                -- Tìm target mới trong FOV
+                local newTarget = findNearestPlayerInFOV()
+                if newTarget and newTarget ~= lockedPlayer then
+                    lockedPlayer = newTarget
+                    print("Switched lock to:", lockedPlayer.Name)
+                else
+                    releaseLock()
+                end
+            else
+                if head then
+                    local targetPos = head.Position
+                    local direction = (targetPos - camera.CFrame.Position).Unit
+                    local targetCFrame = CFrame.new(camera.CFrame.Position, camera.CFrame.Position + direction)
+                    camera.CFrame = camera.CFrame:Lerp(targetCFrame, rotationSpeed)
+                end
+            end
+        elseif lockingOn and (not lockedPlayer or not lockedPlayer.Character) then
+            local newTarget = findNearestPlayerInFOV()
+            if newTarget then
+                lockedPlayer = newTarget
+                print("Locked on new target:", lockedPlayer.Name)
+            else
+                releaseLock()
+            end
         end
     end
 end)
