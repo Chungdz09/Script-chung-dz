@@ -273,3 +273,117 @@ local Slider = MainTab:CreateSlider({
         game.Players.LocalPlayer.Character.Humanoid.JumpPower = (Value)
    end,
 })
+
+local Tab2 = Window:CreateTab("Farming", nil)
+local Section = Tab2:CreateSection("Auto Farm") 
+
+local AutoAttackMushroomSpirit = false
+local MushroomSpiritLoop
+
+-- Dịch vụ
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local ToolActionEvent = ReplicatedStorage:WaitForChild("References"):WaitForChild("Comm"):WaitForChild("Events"):WaitForChild("ToolAction")
+
+-- Toggle GUI
+local Button = Tab2:CreateToggle({
+    Name = "Auto Attack Mushroom Spirit",
+    CurrentValue = false,
+    Flag = "AutoAttackMushroomSpirit",
+    Callback = function(Value)
+        AutoAttackMushroomSpirit = Value
+
+        if AutoAttackMushroomSpirit then
+            MushroomSpiritLoop = task.spawn(function()
+                while AutoAttackMushroomSpirit do
+                    local Spirit = workspace:FindFirstChild("Replicators")
+                        and workspace.Replicators:FindFirstChild("NonPassive")
+                        and workspace.Replicators.NonPassive:FindFirstChild("Mushroom Spirit")
+
+                    local Character = LocalPlayer.Character
+                    local MyRoot = Character and Character:FindFirstChild("HumanoidRootPart")
+
+                    if Spirit and Spirit:FindFirstChild("Humanoid")
+                        and Spirit:FindFirstChild("HumanoidRootPart")
+                        and Spirit.Humanoid.Health > 0 and MyRoot then
+
+                        -- Bay lên đầu Mushroom Spirit (cao 25 studs)
+                        local targetPos = Spirit.HumanoidRootPart.Position + Vector3.new(0, 12, 0)
+                        local targetCFrame = CFrame.new(targetPos)
+
+                        TweenService:Create(MyRoot, TweenInfo.new(0.02, Enum.EasingStyle.Linear), {
+                            CFrame = targetCFrame
+                        }):Play()
+
+                        -- Gửi lệnh tấn công
+                        ToolActionEvent:FireServer(Spirit)
+                    end
+
+                    task.wait(0.5)
+                end
+            end)
+        else
+            if MushroomSpiritLoop then
+                task.cancel(MushroomSpiritLoop)
+            end
+        end
+    end,
+})
+
+-- Biến điều khiển
+local AutoAttackLuckySlime = false
+local LuckySlimeLoop
+
+-- Dịch vụ
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local ToolActionEvent = ReplicatedStorage:WaitForChild("References"):WaitForChild("Comm"):WaitForChild("Events"):WaitForChild("ToolAction")
+
+-- Toggle GUI
+local Button = Tab2:CreateToggle({
+    Name = "Auto Attack Lucky Slime",
+    CurrentValue = false,
+    Flag = "AutoAttackLuckySlime",
+    Callback = function(Value)
+        AutoAttackLuckySlime = Value
+
+        if AutoAttackLuckySlime then
+            LuckySlimeLoop = task.spawn(function()
+                while AutoAttackLuckySlime do
+                    local Slime = workspace:FindFirstChild("Replicators")
+                        and workspace.Replicators:FindFirstChild("Both")
+                        and workspace.Replicators.Both:FindFirstChild("Lucky Slime")
+
+                    local Character = LocalPlayer.Character
+                    local MyRoot = Character and Character:FindFirstChild("HumanoidRootPart")
+
+                    if Slime and Slime:FindFirstChild("Humanoid") and Slime:FindFirstChild("HumanoidRootPart")
+                        and Slime.Humanoid.Health > 0 and MyRoot then
+
+                        -- Tính vị trí bay lên trên đầu Slime
+                        local targetPos = Slime.HumanoidRootPart.Position + Vector3.new(0, 15, 0)
+                        local targetCFrame = CFrame.new(targetPos)
+
+                        -- Di chuyển đến vị trí trên đầu Slime
+                        TweenService:Create(MyRoot, TweenInfo.new(0.01, Enum.EasingStyle.Linear), {
+                            CFrame = targetCFrame
+                        }):Play()
+
+                        -- Gửi lệnh tấn công
+                        ToolActionEvent:FireServer(Slime)
+                    end
+
+                    task.wait(0.5)
+                end
+            end)
+        else
+            if LuckySlimeLoop then
+                task.cancel(LuckySlimeLoop)
+            end
+        end
+    end,
+})
