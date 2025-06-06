@@ -83,6 +83,12 @@ local Button = MainTab:CreateButton({
 })
 
 local Button = MainTab:CreateButton({
+   Name = "Draw Player",
+   Callback = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Stallion2108/Script-chung-dz/refs/heads/main/Draw%20Player"))()
+   end,
+})
+local Button = MainTab:CreateButton({
    Name = "Big Hitbox",
    Callback = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Chungdz09/Script-chung-dz/refs/heads/main/Big%20Hitbox"))()
