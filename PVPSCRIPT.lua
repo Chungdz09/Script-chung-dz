@@ -24,6 +24,11 @@ local Window = Rayfield:CreateWindow({
  local MainTab = Window:CreateTab("🏠 Main", nil) 
  local MainSection = MainTab:CreateSection("Other Scripts")
 
+game.StarterGui:SetCore("SendNotification", {
+    Title = "Script Loaded",
+    Text = "PVP Script Loaded Successfully.",
+    Duration = 4,
+})
 
 local Button = MainTab:CreateButton({
    Name = "Ctrl + click TP",
