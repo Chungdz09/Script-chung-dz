@@ -1,6 +1,6 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
-    Name = "                                Island Tribes 🌴",
+    Name = "                                Island TribesPVP 🌴",
     LoadingTitle = "WSP",
     LoadingSubtitle = "Made by Chungdz credit to Friend",
     ConfigurationSaving = {
@@ -225,37 +225,54 @@ local function ToggleAutoMine(state)
         AutoMineThread = task.spawn(function()
             local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
             local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
             while AutoMine do
-                -- Tự động đánh Volcanic Rock
+                -- 1. Tự động đánh Volcanic Rock
                 local volcanicRock = workspace:FindFirstChild("Volcanic Rock")
                 if volcanicRock then
                     ToolActionEvent:FireServer(volcanicRock)
                 end
 
-                -- Quét xung quanh và tự đào mỏ trong phạm vi
+                -- 2. Tự động đánh "Plantain" nếu tồn tại
+                local plantain = workspace:FindFirstChild("Replicators") and workspace.Replicators:FindFirstChild("Both") and workspace.Replicators.Both:FindFirstChild("Plantain")
+                if plantain then
+                    ToolActionEvent:FireServer(plantain)
+                end
+
+                -- 3. Quét xung quanh và tìm mỏ gần nhất trong phạm vi
                 local mineFolder = workspace:FindFirstChild("Replicators") and workspace.Replicators:FindFirstChild("Both")
                 if mineFolder then
+                    local closestMine = nil
+                    local closestDistance = RANGE
+
                     for _, mineObject in pairs(mineFolder:GetChildren()) do
                         if mineObject:IsA("BasePart") then
                             local dist = (mineObject.Position - HumanoidRootPart.Position).Magnitude
-                            if dist < RANGE then
-                                ToolActionEvent:FireServer(mineObject)
+                            if dist < closestDistance then
+                                closestMine = mineObject
+                                closestDistance = dist
                             end
                         elseif mineObject:IsA("Model") and not mineObject:FindFirstChildWhichIsA("Humanoid") then
                             for _, child in pairs(mineObject:GetDescendants()) do
                                 if child:IsA("BasePart") then
                                     local dist = (child.Position - HumanoidRootPart.Position).Magnitude
-                                    if dist < RANGE then
-                                        ToolActionEvent:FireServer(mineObject)
+                                    if dist < closestDistance then
+                                        closestMine = mineObject
+                                        closestDistance = dist
                                         break
                                     end
                                 end
                             end
                         end
                     end
+
+                    -- Đào mỏ gần nhất
+                    if closestMine then
+                        ToolActionEvent:FireServer(closestMine)
+                    end
                 end
 
-                task.wait(0.5)
+                task.wait(0.5) -- Chờ giữa các lần đánh
             end
             AutoMineThread = nil
         end)
@@ -272,13 +289,8 @@ MainTab:CreateToggle({
     end,
 })
 
-
 local AutoAttackPlayer = false
-local AutoAttackMod = false
-
--- Biến giữ vòng lặp cho mỗi loại
 local AttackPlayerLoop
-local AttackModLoop
 
 -- Dịch vụ cần thiết
 local Players = game:GetService("Players")
@@ -294,61 +306,111 @@ MainTab:CreateToggle({
         AutoAttackPlayer = Value
 
         if AutoAttackPlayer then
+            if AttackPlayerLoop then return end
             AttackPlayerLoop = task.spawn(function()
                 while AutoAttackPlayer do
                     local Character = LocalPlayer.Character
                     local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
+
                     if HumanoidRootPart then
+                        local closestPlayer = nil
+                        local closestDistance = 17
+
                         for _, player in pairs(Players:GetPlayers()) do
                             if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
                                 local targetHRP = player.Character.HumanoidRootPart
-                                if (targetHRP.Position - HumanoidRootPart.Position).Magnitude <= 17 then
-                                    ToolActionEvent:FireServer(player.Character)
+                                local dist = (targetHRP.Position - HumanoidRootPart.Position).Magnitude
+                                if dist <= closestDistance then
+                                    closestPlayer = player.Character
+                                    closestDistance = dist
                                 end
                             end
                         end
+
+                        if closestPlayer then
+                            ToolActionEvent:FireServer(closestPlayer)
+                        end
                     end
-                    task.wait(0.3)
+
+                    task.wait(0.1)
                 end
+                AttackPlayerLoop = nil
             end)
         else
             if AttackPlayerLoop then
                 task.cancel(AttackPlayerLoop)
+                AttackPlayerLoop = nil
             end
         end
     end,
 })
 
-MainTab:CreateToggle({
-    Name = "Mod Aura",
-    CurrentValue = false,
-    Flag = "AutoAttackMod",
-    Callback = function(Value)
-        AutoAttackMod = Value
+-- SERVICES
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
 
-        if AutoAttackMod then
-            AttackModLoop = task.spawn(function()
-                while AutoAttackMod do
-                    local Character = LocalPlayer.Character
-                    local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
-                    if HumanoidRootPart then
-                        for _, npc in pairs(workspace:GetDescendants()) do
-                            if npc:IsA("Model") and npc:FindFirstChild("Humanoid") and npc:FindFirstChild("HumanoidRootPart") then
-                                local dist = (npc.HumanoidRootPart.Position - HumanoidRootPart.Position).Magnitude
-                                if dist <= 17 then
-                                    ToolActionEvent:FireServer(npc)
+-- VARIABLES
+local LocalPlayer = Players.LocalPlayer
+local ToolActionEvent = ReplicatedStorage:WaitForChild("References"):WaitForChild("Comm"):WaitForChild("Events"):WaitForChild("ToolAction")
+
+local RANGE = 17 -- phạm vi dưới 17 studs
+local AutoAttackMob = false
+local AutoAttackMobThread
+
+-- TOGGLE FUNCTION
+local function ToggleAutoAttackMob(state)
+    AutoAttackMob = state
+    if AutoAttackMob then
+        if AutoAttackMobThread then return end
+        AutoAttackMobThread = task.spawn(function()
+            local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
+            while AutoAttackMob do
+                local mobFolder = Workspace:FindFirstChild("Replicators") and Workspace.Replicators:FindFirstChild("Both")
+                if mobFolder then
+                    local closestMob = nil
+                    local closestDistance = RANGE
+
+                    for _, mob in pairs(mobFolder:GetChildren()) do
+                        if mob:IsA("Model") and mob:FindFirstChildWhichIsA("Humanoid") then
+                            local mobHRP = mob:FindFirstChild("HumanoidRootPart") or mob:FindFirstChild("Torso")
+                            if mobHRP then
+                                local dist = (mobHRP.Position - HumanoidRootPart.Position).Magnitude
+                                if dist < closestDistance then
+                                    closestMob = mob
+                                    closestDistance = dist
                                 end
                             end
                         end
                     end
-                    task.wait(0.5)
+
+                    if closestMob then
+                        ToolActionEvent:FireServer(closestMob)
+                    end
                 end
-            end)
-        else
-            if AttackModLoop then
-                task.cancel(AttackModLoop)
+
+                task.wait(0.3)
             end
+
+            AutoAttackMobThread = nil
+        end)
+    else
+        if AutoAttackMobThread then
+            task.cancel(AutoAttackMobThread)
+            AutoAttackMobThread = nil
         end
+    end
+end
+
+-- GUI TOGGLE BUTTON
+MainTab:CreateToggle({
+    Name = "Mob Aura",
+    CurrentValue = false,
+    Flag = "AutoAttackMobToggle",
+    Callback = function(value)
+        ToggleAutoAttackMob(value)
     end,
 })
 
