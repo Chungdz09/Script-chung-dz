@@ -232,19 +232,10 @@ local function ToggleAutoMine(state)
             local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
 
             while AutoMine do
-                -- 1. Tự động đánh Volcanic Rock
                 local volcanicRock = workspace:FindFirstChild("Volcanic Rock")
                 if volcanicRock then
                     ToolActionEvent:FireServer(volcanicRock)
                 end
-
-                -- 2. Tự động đánh "Plantain" nếu tồn tại
-                local plantain = workspace:FindFirstChild("Replicators") and workspace.Replicators:FindFirstChild("Both") and workspace.Replicators.Both:FindFirstChild("Plantain")
-                if plantain then
-                    ToolActionEvent:FireServer(plantain)
-                end
-
-                -- 3. Quét xung quanh và tìm mỏ gần nhất trong phạm vi
                 local mineFolder = workspace:FindFirstChild("Replicators") and workspace.Replicators:FindFirstChild("Both")
                 if mineFolder then
                     local closestMine = nil
