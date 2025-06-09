@@ -328,7 +328,7 @@ MainTab:CreateToggle({
                         end
                     end
 
-                    task.wait(0.1)
+                    task.wait(0.05)
                 end
                 AttackPlayerLoop = nil
             end)
