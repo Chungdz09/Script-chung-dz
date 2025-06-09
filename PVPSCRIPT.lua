@@ -689,3 +689,75 @@ local Button = Tab2:CreateToggle({
         end
     end,
 })
+
+local AutoAttackObsidianGolem = false
+local ObsidianGolemLoop
+local HoverForce
+
+-- Dịch vụ
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local ToolActionEvent = ReplicatedStorage:WaitForChild("References"):WaitForChild("Comm"):WaitForChild("Events"):WaitForChild("ToolAction")
+
+-- Toggle GUI
+local Button = Tab2:CreateToggle({
+    Name = "Auto Attack Obsidian Golem",
+    CurrentValue = false,
+    Flag = "AutoAttackObsidianGolem",
+    Callback = function(Value)
+        AutoAttackObsidianGolem = Value
+
+        local Character = LocalPlayer.Character
+        local MyRoot = Character and Character:FindFirstChild("HumanoidRootPart")
+
+        if AutoAttackObsidianGolem then
+            ObsidianGolemLoop = task.spawn(function()
+                while AutoAttackObsidianGolem do
+                    local Golem = workspace:FindFirstChild("Replicators")
+                        and workspace.Replicators:FindFirstChild("NonPassive")
+                        and workspace.Replicators.NonPassive:FindFirstChild("Obsidian Golem")
+
+                    Character = LocalPlayer.Character
+                    MyRoot = Character and Character:FindFirstChild("HumanoidRootPart")
+
+                    if Golem and Golem:FindFirstChild("Humanoid") and Golem:FindFirstChild("HumanoidRootPart")
+                        and Golem.Humanoid.Health > 0 and MyRoot then
+
+                        -- Tạo BodyVelocity để giữ nhân vật bay
+                        if not HoverForce then
+                            HoverForce = Instance.new("BodyVelocity")
+                            HoverForce.Velocity = Vector3.new(0, 0, 0)
+                            HoverForce.MaxForce = Vector3.new(0, 1e5, 0)
+                            HoverForce.Name = "AntiGravity"
+                            HoverForce.Parent = MyRoot
+                        end
+
+                        -- Bay lên đầu Golem
+                        local targetPos = Golem.HumanoidRootPart.Position + Vector3.new(0, 15, 0)
+                        local targetCFrame = CFrame.new(targetPos)
+
+                        TweenService:Create(MyRoot, TweenInfo.new(0.1, Enum.EasingStyle.Linear), {
+                            CFrame = targetCFrame
+                        }):Play()
+
+                        -- Tấn công
+                        ToolActionEvent:FireServer(Golem)
+                    end
+
+                    task.wait(0.5)
+                end
+            end)
+        else
+            if ObsidianGolemLoop then
+                task.cancel(ObsidianGolemLoop)
+            end
+            -- Gỡ BodyVelocity
+            if HoverForce then
+                HoverForce:Destroy()
+                HoverForce = nil
+            end
+        end
+    end,
+})
