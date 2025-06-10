@@ -19,9 +19,9 @@ local function Hitbox()
                 if IsPlayerAlive(plr) then
                     local hitbox = plr.Character:FindFirstChild("Hitbox")
                     if hitbox then
-                        -- Set the size of the hitbox to (15, 15, 15) if it's not already set
-                        if hitbox.Size ~= Vector3.new(15, 15, 15) then
-                            hitbox.Size = Vector3.new(15,15, 15)
+                        -- Set the size of the hitbox to (12, 12, 12) if it's not already set
+                        if hitbox.Size ~= Vector3.new(12, 12, 12) then
+                            hitbox.Size = Vector3.new(12,12, 12)
                         end
                     end
                 end
