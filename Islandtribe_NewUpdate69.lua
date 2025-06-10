@@ -156,35 +156,6 @@ local Button = MainTab:CreateButton({
 })
 
 local Button = MainTab:CreateButton({
-    Name = "Heal with Pumpkin if HP < 100 ",
-    Callback = function()
-        local Players = game:GetService("Players")
-        local ReplicatedStorage = game:GetService("ReplicatedStorage")
-        local LocalPlayer = Players.LocalPlayer
-        local Event = ReplicatedStorage.References.Comm.Events.InventoryInteraction
-        local itemID = 378  -- Pumpkin ID
-        local action = "Eat"
-
-        local function IsPlayerAlive()
-            return LocalPlayer and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") and LocalPlayer.Character.Humanoid.Health > 0
-        end
-
-        task.spawn(function()
-            while true do
-                task.wait(0.1)
-                if not IsPlayerAlive() then break end
-                local hum = LocalPlayer.Character.Humanoid
-                if hum.Health < 100 then
-                    Event:FireServer(itemID, action)
-                else
-                    break -- Stop healing once HP is 65 or higher
-                end
-            end
-        end)
-    end
-})
-
-local Button = MainTab:CreateButton({
    Name = "ESP",
    Callback = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Stallion2108/Script-chung-dz/refs/heads/main/ESP.lua"))()
@@ -222,6 +193,52 @@ local Toggle = MainTab:CreateToggle({
    Callback = function(Value)
    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/Infinite%20Jump.txt"))()
    end,
+})
+
+local healingEnabled = false
+local healTask = nil
+
+local Button = MainTab:CreateToggle({
+    Name = "Spam Pumpkin If <100HP",
+    Default = false,
+    Callback = function(state)
+        healingEnabled = state
+
+        local Players = game:GetService("Players")
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local LocalPlayer = Players.LocalPlayer
+        local Event = ReplicatedStorage.References.Comm.Events.InventoryInteraction
+        local itemID = 378  -- Pumpkin ID
+        local action = "Eat"
+        local delayTime = 0.01 -- Thời gian chờ giữa mỗi lần kiểm tra (có thể chỉnh)
+
+        local function IsPlayerAlive()
+            return LocalPlayer and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") and LocalPlayer.Character.Humanoid.Health > 0
+        end
+
+        -- Nếu tắt toggle thì dừng vòng lặp
+        if not healingEnabled then
+            healTask = nil
+            return
+        end
+
+        -- Nếu chưa có vòng lặp thì tạo mới
+        if not healTask then
+            healTask = task.spawn(function()
+                while healingEnabled do
+                    task.wait(delayTime)
+                    if not IsPlayerAlive() then
+                        break
+                    end
+
+                    local hum = LocalPlayer.Character.Humanoid
+                    if hum.Health < 100 then
+                        Event:FireServer(itemID, action)
+                    end
+                end
+            end)
+        end
+    end
 })
 
 -- Biến toàn cục để bật/tắt auto pickup
