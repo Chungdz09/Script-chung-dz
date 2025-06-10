@@ -142,7 +142,7 @@ local healingEnabled = false
 local healTask = nil
 
 local Button = MainTab:CreateToggle({
-    Name = "Auto Heal with Pumpkin if HP < 100",
+    Name = "Spam Pumpkin If <100HP",
     Default = false,
     Callback = function(state)
         healingEnabled = state
