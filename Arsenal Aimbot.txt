@@ -1,208 +1,207 @@
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local GuiService = game:GetService("GuiService")
 
--- Config
-local lockRange = 2000
+-- Configuration
+local lockRange = 10000
+local screenRadius = 100
 local rotationSpeed = 1
-local fovAngle = 16
-local visualFovRadius = 100
-local toggleKey = Enum.KeyCode.F
-local maxTargetSpeed = 50
+local teleportThreshold = 15
 
 local localPlayer = Players.LocalPlayer
 local camera = workspace.CurrentCamera
+
 local lockedPlayer = nil
 local lockingOn = false
-local lockEnabled = true
+local holdingRightClick = false
+local uiVisible = true
+local teamCheckEnabled = true
+local lastTargetPosition = nil
 
-local fovCircle = nil
+-- GUI Setup
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TargetLockUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = localPlayer:WaitForChild("PlayerGui")
 
-local function createFOVCircle()
-    if fovCircle then return end
-    fovCircle = Drawing.new("Circle")
-    fovCircle.Color = Color3.fromRGB(255, 0, 0)
-    fovCircle.Thickness = 2
-    fovCircle.Radius = visualFovRadius
-    fovCircle.Filled = false
-    fovCircle.Transparency = 1
-    fovCircle.Visible = true
-end
+local infoLabel = Instance.new("TextLabel")
+infoLabel.Size = UDim2.new(0, 220, 0, 40)
+infoLabel.Position = UDim2.new(0, 10, 0, 10)
+infoLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+infoLabel.BorderSizePixel = 0
+infoLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+infoLabel.TextScaled = true
+infoLabel.Font = Enum.Font.SourceSansBold
+infoLabel.Text = "Target: None"
+infoLabel.Visible = true
+infoLabel.Parent = screenGui
 
-local function removeFOVCircle()
-    if fovCircle then
-        fovCircle:Remove()
-        fovCircle = nil
-    end
-end
+-- FOV Circle (rỗng bên trong, viền đỏ)
+local fovFrame = Instance.new("Frame")
+fovFrame.Size = UDim2.new(0, screenRadius * 2, 0, screenRadius * 2)
+fovFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+fovFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+fovFrame.BackgroundTransparency = 1
+fovFrame.BorderSizePixel = 0
+fovFrame.Visible = true
+fovFrame.ZIndex = 999
+fovFrame.Parent = screenGui
 
-local function findNearestPlayerInFOV()
-    if not localPlayer.Character or not localPlayer.Character:FindFirstChild("Head") then
-        return nil
-    end
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(1, 9999)
+corner.Parent = fovFrame
 
-    local localPos = localPlayer.Character.Head.Position
-    local camLook = camera.CFrame.LookVector
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(255, 0, 0)
+stroke.Thickness = 2
+stroke.Transparency = 0
+stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+stroke.Parent = fovFrame
 
-    local nearest = nil
-    local shortestDistance = lockRange
+-- Drag UI
+local dragging = false
+local dragStart, startPos
 
-    for _, player in ipairs(Players:GetPlayers()) do
-        if player ~= localPlayer and player.Character and player.Character:FindFirstChild("Head") then
-            if player.Team ~= localPlayer.Team then
-                local targetPos = player.Character.Head.Position
-                local distance = (targetPos - localPos).Magnitude
-
-                if distance < shortestDistance then
-                    local dirToTarget = (targetPos - localPos).Unit
-                    local dot = math.clamp(camLook:Dot(dirToTarget), -1, 1)
-                    local angle = math.deg(math.acos(dot))
-
-                    if angle < fovAngle then
-                        shortestDistance = distance
-                        nearest = player
-                    end
-                end
-            end
-        end
-    end
-
-    return nearest
-end
-
-local function lockOn()
-    local candidate = findNearestPlayerInFOV()
-    if candidate and candidate.Character and candidate.Character:FindFirstChild("HumanoidRootPart") then
-        local hrp = candidate.Character:FindFirstChild("HumanoidRootPart")
-        local speed = hrp.Velocity.Magnitude
-
-        if speed <= maxTargetSpeed then
-            local humanoid = candidate.Character:FindFirstChild("Humanoid")
-            if humanoid and humanoid.Health > 0 then
-                lockedPlayer = candidate
-                lockingOn = true
-                print("Locked on:", lockedPlayer.Name)
-                return
-            end
-        end
-    end
-
-    print("No valid target to lock on.")
-end
-
-local function releaseLock()
-    lockingOn = false
-    lockedPlayer = nil
-end
-
-local function toggleLock()
-    lockEnabled = not lockEnabled
-    print("Lock enabled:", lockEnabled)
-    if lockEnabled then
-        createFOVCircle()
-    else
-        releaseLock()
-        removeFOVCircle()
-    end
-end
-
--- Init FOV Circle
-createFOVCircle()
-
-UserInputService.InputBegan:Connect(function(input, gp)
-    if gp then return end
-    if input.KeyCode == toggleKey then
-        toggleLock()
-    elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
-        if lockEnabled then
-            lockOn()
-        end
-    end
+infoLabel.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = infoLabel.Position
+	end
 end)
 
-UserInputService.InputEnded:Connect(function(input, gp)
-    if input.UserInputType == Enum.UserInputType.MouseButton2 then
-        releaseLock()
-    end
+infoLabel.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
 end)
 
-RunService:BindToRenderStep("LockOnSystem", Enum.RenderPriority.Camera.Value + 1, function()
-    if lockEnabled and fovCircle then
-        local mousePos = UserInputService:GetMouseLocation()
-        fovCircle.Position = Vector2.new(mousePos.X, mousePos.Y)
-    end
-
-    if lockEnabled then
-        if lockingOn and lockedPlayer and lockedPlayer.Character then
-            local character = lockedPlayer.Character
-            local humanoid = character:FindFirstChild("Humanoid")
-            local hrp = character:FindFirstChild("HumanoidRootPart")
-            local head = character:FindFirstChild("Head")
-
-            local invalidTarget = false
-
-            if not humanoid or humanoid.Health <= 0 then
-                print("Target is dead. Releasing lock.")
-                invalidTarget = true
-            end
-
-            if hrp then
-                local speed = hrp.Velocity.Magnitude
-                if speed > maxTargetSpeed then
-                    print("Target moving too fast. Releasing lock.")
-                    invalidTarget = true
-                end
-            else
-                invalidTarget = true
-            end
-
-            if head then
-                local targetPos = head.Position
-                local direction = (targetPos - camera.CFrame.Position).Unit
-                local camLook = camera.CFrame.LookVector
-                local angle = math.deg(math.acos(math.clamp(camLook:Dot(direction), -1, 1)))
-
-                if angle > fovAngle then
-                    print("Target moved out of FOV. Releasing lock.")
-                    invalidTarget = true
-                end
-            else
-                invalidTarget = true
-            end
-
-            if invalidTarget then
-                -- Tìm target mới trong FOV
-                local newTarget = findNearestPlayerInFOV()
-                if newTarget and newTarget ~= lockedPlayer then
-                    lockedPlayer = newTarget
-                    print("Switched lock to:", lockedPlayer.Name)
-                else
-                    releaseLock()
-                end
-            else
-                if head then
-                    local targetPos = head.Position
-                    local direction = (targetPos - camera.CFrame.Position).Unit
-                    local targetCFrame = CFrame.new(camera.CFrame.Position, camera.CFrame.Position + direction)
-                    camera.CFrame = camera.CFrame:Lerp(targetCFrame, rotationSpeed)
-                end
-            end
-        elseif lockingOn and (not lockedPlayer or not lockedPlayer.Character) then
-            local newTarget = findNearestPlayerInFOV()
-            if newTarget then
-                lockedPlayer = newTarget
-                print("Locked on new target:", lockedPlayer.Name)
-            else
-                releaseLock()
-            end
-        end
-    end
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = input.Position - dragStart
+		infoLabel.Position = startPos + UDim2.new(0, delta.X, 0, delta.Y)
+	end
 end)
 
-pcall(function()
-    game.StarterGui:SetCore("SendNotification", {
-        Title = "Auto Lock-On",
-        Text = "Loaded. Press F to toggle.",
-        Duration = 4,
-    })
+-- Helpers
+local function updateUI()
+	if lockedPlayer and lockedPlayer.Character then
+		local teamText = teamCheckEnabled and "(TeamCheck)" or "(Unenable TeamCheck)"
+		infoLabel.Text = "Target: " .. lockedPlayer.Name .. " " .. teamText
+	else
+		local teamText = teamCheckEnabled and "(0eamCheck)" or "(Unenable TeamCheck)"
+		infoLabel.Text = "Target: None " .. teamText
+	end
+end
+
+local function isInMouseCircle(worldPosition, mousePos)
+	local screenPoint, onScreen = camera:WorldToViewportPoint(worldPosition)
+	if not onScreen then return false end
+
+	local distance = (Vector2.new(screenPoint.X, screenPoint.Y) - mousePos).Magnitude
+	return distance <= screenRadius
+end
+
+local function findClosestPlayerInFOV(mousePos)
+	local closestPlayer = nil
+	local shortestDistance = math.huge
+
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= localPlayer and player.Character and player.Character:FindFirstChild("Head") then
+			if teamCheckEnabled and player.Team == localPlayer.Team then
+				continue
+			end
+
+			local head = player.Character.Head
+			local screenPoint, onScreen = camera:WorldToViewportPoint(head.Position)
+
+			if onScreen then
+				local distance = (Vector2.new(screenPoint.X, screenPoint.Y) - mousePos).Magnitude
+				if distance <= screenRadius and distance < shortestDistance then
+					closestPlayer = player
+					shortestDistance = distance
+				end
+			end
+		end
+	end
+
+	return closestPlayer
+end
+
+-- Input handling
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+	if gameProcessed then return end
+
+	if input.UserInputType == Enum.UserInputType.MouseButton2 then
+		holdingRightClick = true
+	elseif input.KeyCode == Enum.KeyCode.F1 then
+		uiVisible = not uiVisible
+		infoLabel.Visible = uiVisible
+		fovFrame.Visible = uiVisible
+	elseif input.KeyCode == Enum.KeyCode.T then
+		teamCheckEnabled = not teamCheckEnabled
+		updateUI()
+	end
 end)
+
+UserInputService.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton2 then
+		holdingRightClick = false
+		lockingOn = false
+	end
+end)
+
+-- Camera follow
+RunService.RenderStepped:Connect(function()
+	local mousePos = UserInputService:GetMouseLocation() - GuiService:GetGuiInset()
+	fovFrame.Position = UDim2.new(0, mousePos.X, 0, mousePos.Y)
+
+	if holdingRightClick and (not lockedPlayer or not lockingOn) then
+		local target = findClosestPlayerInFOV(mousePos)
+		if target then
+			lockedPlayer = target
+			lockingOn = true
+			updateUI()
+		end
+	end
+
+	if lockingOn and lockedPlayer and lockedPlayer.Character then
+		local head = lockedPlayer.Character:FindFirstChild("Head")
+		local humanoid = lockedPlayer.Character:FindFirstChild("Humanoid")
+
+		if not head or not humanoid or humanoid.Health <= 0 then
+			lockedPlayer = nil
+			lockingOn = false
+			lastTargetPosition = nil
+			updateUI()
+			return
+		end
+
+		if lastTargetPosition then
+			local movedDistance = (head.Position - lastTargetPosition).Magnitude
+			if movedDistance >= teleportThreshold then
+				lockedPlayer = nil
+				lockingOn = false
+				lastTargetPosition = nil
+				updateUI()
+				return
+			end
+		end
+
+		lastTargetPosition = head.Position
+
+		local direction = (head.Position - camera.CFrame.Position).Unit
+		local targetCFrame = CFrame.new(camera.CFrame.Position, camera.CFrame.Position + direction)
+		camera.CFrame = camera.CFrame:Lerp(targetCFrame, rotationSpeed)
+	else
+		lastTargetPosition = nil
+	end
+end)
+
+-- Notify
+game.StarterGui:SetCore("SendNotification", {
+	Title = "🎯 Target Lock",
+	Text = "Giữ chuột phải để ngắm | F1: Ẩn/Hiện | T: Bật/Tắt team check",
+	Duration = 6,
+})
