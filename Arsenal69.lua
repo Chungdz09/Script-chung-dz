@@ -146,7 +146,7 @@ local Button = MainTab:CreateButton({
 })
 
 local Button = MainTab:CreateButton({
-   Name = "Aimbot FOV Use F On/Off",
+   Name = "Aimbot FOV Use T to On/Off Teamcheck",
    Callback = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Stallion2108/Script-chung-dz/refs/heads/main/Arsenal%20Aimbot.txt"))()
    end,
