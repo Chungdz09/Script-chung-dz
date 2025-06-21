@@ -682,7 +682,7 @@ local Button = Tab3:CreateButton({
 })
 
 local Button = Tab3:CreateButton({
-    Name = "🎃Pumpkin Shield 10x🎃",
+    Name = "🎃Pumpkin Shield🎃",
     Callback = function()
         local chest = GetClosestChest()
         if not chest then
@@ -1098,3 +1098,98 @@ local Button = Tab5:CreateButton({
         Event:FireServer(chestID, action)
     end
 })
+
+local Tab6 = Window:CreateTab("Other", nil)
+local Section = Tab6:CreateSection("Moon Stone And Obsidian")
+
+local Button = Tab6:CreateButton({
+    Name = "Moon Stone X200",
+    Callback = function()
+        local chest = GetClosestChest()
+        if not chest then
+            warn("No nearby chest found.")
+            return
+        end
+
+        local putIn = true
+        local itemIDs = {361}
+        
+        for i = 1, 200 do
+            table.insert(itemIDs, 361)
+        end
+        local Event = ReplicatedStorage.References.Comm.Events.UpdateStorageChest
+
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+})
+
+local Button = Tab6:CreateButton({
+    Name = "Lunar Ore X200",
+    Callback = function()
+        local chest = GetClosestChest()
+        if not chest then
+            warn("No nearby chest found.")
+            return
+        end
+
+        local putIn = true
+        local itemIDs = {360}
+        
+        for i = 1, 200 do
+            table.insert(itemIDs, 360)
+        end
+        local Event = ReplicatedStorage.References.Comm.Events.UpdateStorageChest
+
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+})
+
+local Button = Tab6:CreateButton({
+    Name = "Volcanic Ore X200",
+    Callback = function()
+        local chest = GetClosestChest()
+        if not chest then
+            warn("No nearby chest found.")
+            return
+        end
+
+        local putIn = true
+        local itemIDs = {223}
+        
+        for i = 1, 200 do
+            table.insert(itemIDs, 223)
+        end
+        local Event = ReplicatedStorage.References.Comm.Events.UpdateStorageChest
+
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+})
+
+local Button = Tab6:CreateButton({
+    Name = "Obsidian X200",
+    Callback = function()
+        local chest = GetClosestChest()
+        if not chest then
+            warn("No nearby chest found.")
+            return
+        end
+
+        local putIn = true
+        local itemIDs = {224}
+        
+        for i = 1, 200 do
+            table.insert(itemIDs, 224)
+        end
+        local Event = ReplicatedStorage.References.Comm.Events.UpdateStorageChest
+
+        for _, itemID in ipairs(itemIDs) do
+            Event:FireServer(chest, putIn, itemID)
+        end
+    end,
+ ]}
